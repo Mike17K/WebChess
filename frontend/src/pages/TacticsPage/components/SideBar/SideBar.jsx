@@ -12,7 +12,7 @@ export default function SideBar({setTactic,className}) {
     <div className={`flex flex-col p-2 align-middle ${className}`}>
         {
             categories.map((category) =>
-            <Category setTactic={setTactic} uid={category.uid} name={category.name}/>
+            <Category key={category.uid} setTactic={setTactic} uid={category.uid} name={category.name}/>
             )
         }
     </div>

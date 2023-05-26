@@ -25,22 +25,22 @@ export default function MainScreen({className,tactic}) {
   return (
     <div className={`${className} w-full flex flex-col align-middle p-10`}>
         
-        <h2 className='text-center font-serif font-bold'>{data.titleCategory}</h2>
-        <h3 className='text-center font-serif'>{data.title} - {data.isWhiteTurn?"White":"Black"} to play</h3>
+        <h2 className='text-center font-serif text-[40px] font-bold'>{data.titleCategory}</h2>
+        <h3 className='text-center font-serif text-[20px] font-semibold'>{data.title} - {data.isWhiteTurn?"White":"Black"} to play</h3>
 
         <ChessBoard fen={data.fen} whiteSide={whiteSide}/>
 
         <div className='ml-auto mb-2'>
-        <button onClick={()=> setWhiteSide(!whiteSide)} className="mr-[10px] w-20 text-center rounded hover:bg-slate-500 bg-slate-300">Rotate</button>
-        <button onClick={()=> setSolutinoShow(!solutinoShow)} className=" mr-[60px] w-20 text-center rounded hover:bg-slate-500 bg-slate-300">Solution</button>
+        <button onClick={()=> setWhiteSide(!whiteSide)} className="px-4 mr-[10px] font-serif text-[20px] font-semibold text-center rounded hover:bg-slate-500 bg-slate-300">Rotate</button>
+        <button onClick={()=> setSolutinoShow(!solutinoShow)} className="px-4 mr-[60px] font-serif text-[20px] font-semibold text-center rounded hover:bg-slate-500 bg-slate-300">Solution</button>
         </div>
 
-        <h3 className='text-center font-serif font-bold'>{data.tacticInfo}</h3>
+        <h3 className='text-center font-serif text-[20px] font-semibold'>{data.tacticInfo}</h3>
         {
             solutinoShow && (
                 <>
-                <h3 className='text-center font-serif font-bold'>{data.solution}</h3>
-                <h3 className='text-center font-serif'>{data.comments}</h3>
+                <h3 className='text-center font-serif text-[30px] font-bold'>{data.solution}</h3>
+                <h3 className='text-center font-serif text-[20px]'>{data.comments}</h3>
                 </>
                 )
             }

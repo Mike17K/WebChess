@@ -20,13 +20,13 @@ export default function Category({name,uid,setTactic}) {
     <>
     <button key={uid} onClick={()=> setActive(!active)} 
     className={`${active? "bg-slate-700 text-white rounded-[10px]":"bg-slate-200 text-black"} 
-    w-[110px] 
-    group h-[40px] border-2 mx-auto p-2 my-[2px] 
-    font-light text-base text-center 
+    w-[80%] h-[50px]
+    group border-2 mx-auto p-2 my-[5px] 
+    font-light text-center
     hover:bg-slate-500 hover:rounded-[10px] 
     transition-all 
     flex items-center justify-between`}> 
-    <span class="font-serif text-xs">{name}</span>
+    <span className="font-serif text-[20px] font-semibold">{name}</span>
 
     <svg width="20" height="20" className={`transform origin-center ${active? "-rotate-90":""} transition-transform`}>
         <line x1="10" y1="10" x2="20" y2="5" stroke="black" />
@@ -36,9 +36,10 @@ export default function Category({name,uid,setTactic}) {
 
     <div className={`${active?"max-h-[100px]":"max-h-0"} 
     w-full ml-[0px] overflow-hidden text-xs flex flex-col transition-all ease-in-out duration-500
+    text-[20px]
     `}>
   {tactics.map((tactic) => (
-    <button key={tactic.endpoint} onClick={() => setTactic(tactic)}>
+    <button className="pb-1" key={tactic.endpoint} onClick={() => setTactic(tactic)}>
       {tactic.title}
     </button>
   ))}
