@@ -34,8 +34,52 @@ const board = [
     "bR","bN","bB","bK","bQ","bB","bN","bR",
 ]
 
-export default function ChessBoard({className,whiteSide}) {
+function fenToPieceNamesArray(fen,board) { // fix this to update board
+    console.log(fen) ?????????????????????????????
+
+    const fenParts = fen.split(' ');
+    const piecePlacement = fenParts[0];
+    const pieceNames = {
+      'P': 'Pawn',
+      'N': 'Knight',
+      'B': 'Bishop',
+      'R': 'Rook',
+      'Q': 'Queen',
+      'K': 'King'
+    };
+  
+    const rows = piecePlacement.split('/');
+    const result = [];
+  
+    for (let i = 0; i < rows.length; i++) {
+      let row = '';
+      let colIndex = 0;
+  
+      for (let j = 0; j < rows[i].length; j++) {
+        const char = rows[i][j];
+  
+        if (!isNaN(char)) {
+          colIndex += parseInt(char, 10);
+        } else {
+          const pieceName = pieceNames[char.toUpperCase()];
+          row += pieceName;
+          colIndex++;
+        }
+      }
+  
+      result.push(row);
+    }
+
+    board = result
+  }
+  
+
+export default function ChessBoard({fen,className,whiteSide}) {
     const [squares, setSquares] = useState([])
+
+    useEffect(()=>{
+        fenToPieceNamesArray(fen,board);
+    },[fen]);
 
     useEffect(()=>{
         let sq=[];
