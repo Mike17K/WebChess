@@ -23,7 +23,7 @@ export default function MainScreen({className,tactic}) {
 },[tactic])
 
   return (
-    <div className={`${className} w-full flex flex-col align-middle p-10`}>
+    <div className={`${className} max-w-2xl w-full flex flex-col align-middle p-10`}>
         
         <h2 className='text-center font-serif text-[40px] font-bold'>{data.titleCategory}</h2>
         <h3 className='text-center font-serif text-[20px] font-semibold'>{data.title} - {data.isWhiteTurn?"White":"Black"} to play</h3>

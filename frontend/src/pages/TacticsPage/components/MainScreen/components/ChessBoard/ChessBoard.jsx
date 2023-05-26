@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 function Square({pos,whiteSide,piece}){
         
-    return <div className={`relative flex justify-center align-middle w-[12.5%] aspect-square ${(pos.x+pos.y+1)%2===0 ?" bg-stone-600":"bg-white"}`}>
+    return <div className={`select-none relative flex justify-center align-middle w-[12.5%] aspect-square ${(pos.x+pos.y+1)%2===0 ?" bg-stone-600":"bg-white"}`}>
         <span className="absolute -bottom-0.5 right-1 text-[15px] font-semibold">
         {
             ((pos.y===1 && whiteSide ) || (pos.y===8 && !whiteSide )) && (['a','b','c','d','e','f','g','h'][pos.x-1])
@@ -23,66 +23,55 @@ function Square({pos,whiteSide,piece}){
     </div>;
 }
 
-const board = [
-    "wR","wN","wB","wK","wQ","wB","wN","wR",
-    "wp","wp","wp","wp","wp","wp","wp","wp",
-    "","","","","","","","",
-    "","","","","","","","",
-    "","","","","","","","",
-    "","","","","","","","",
-    "bp","bp","bp","bp","bp","bp","bp","bp",
-    "bR","bN","bB","bK","bQ","bB","bN","bR",
-]
-
-function fenToPieceNamesArray(fen,board) { // fix this to update board
-    console.log(fen) ?????????????????????????????
+function fenToPieceNamesArray(fen, board) {
+    console.log(fen);
+    if(fen===undefined) return;
 
     const fenParts = fen.split(' ');
     const piecePlacement = fenParts[0];
-    const pieceNames = {
-      'P': 'Pawn',
-      'N': 'Knight',
-      'B': 'Bishop',
-      'R': 'Rook',
-      'Q': 'Queen',
-      'K': 'King'
-    };
   
     const rows = piecePlacement.split('/');
-    const result = [];
-  
-    for (let i = 0; i < rows.length; i++) {
-      let row = '';
+    
+    for (let r = 0; r < rows.length; r++) {
       let colIndex = 0;
   
-      for (let j = 0; j < rows[i].length; j++) {
-        const char = rows[i][j];
-  
-        if (!isNaN(char)) {
-          colIndex += parseInt(char, 10);
-        } else {
-          const pieceName = pieceNames[char.toUpperCase()];
-          row += pieceName;
-          colIndex++;
-        }
-      }
-  
-      result.push(row);
-    }
+      for (let j = 0; j < rows[r].length; j++) {
+        const char = rows[r][j];
+        
+        if (!isNaN(parseInt(char, 10))) {
+          for(let i=0; i<parseInt(char, 10); i++) {
+            board[8*r+colIndex] = ""
+            colIndex++;
+          }
+          continue
+        } 
 
-    board = result
+        board[8*r+colIndex] = (/[A-Z\W]/.test(char)?"w":"b") + char.toUpperCase();
+        colIndex++;
+      }
+    }
+    console.log(board);
+  
   }
   
+  const board = [
+    "wR", "wN", "wB", "wK", "wQ", "wB", "wN", "wR",
+    "wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp",
+    "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "",
+    "bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp",
+    "bR", "bN", "bB", "bK", "bQ", "bB", "bN", "bR",
+  ];
+  
 
-export default function ChessBoard({fen,className,whiteSide}) {
-    const [squares, setSquares] = useState([])
-
-    useEffect(()=>{
-        fenToPieceNamesArray(fen,board);
-    },[fen]);
-
+  export default function ChessBoard({fen,className,whiteSide}) {
+      const [squares, setSquares] = useState([])
+      
     useEffect(()=>{
         let sq=[];
+        fenToPieceNamesArray(fen,board);
         if(!whiteSide){            
 
             for (let r = 1; r <=8; r++) {
@@ -97,12 +86,9 @@ export default function ChessBoard({fen,className,whiteSide}) {
                 }
             }
         }
+ setSquares(sq)
 
-            
-
-       setSquares(sq)
-
-    },[whiteSide])
+    },[whiteSide,fen])
 
   return (
     <>
