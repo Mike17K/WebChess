@@ -28,11 +28,12 @@ export default function Category({name,uid,setTactic}) {
 
   return (
     <>
-<div className={`relative ${active? "bg-slate-700 text-white rounded-[10px]":"bg-slate-200 text-black"} 
-border border-black p-1 my-[5px] mx-auto w-[80%] h-[50px]
-hover:rounded-[10px] group
-` }>
-    <button key={uid} onClick={()=> setActive(!active)} 
+ <button key={uid} onClick={()=> setActive(!active)} 
+ className={`relative ${active? "bg-slate-700 text-white rounded-[10px]":"bg-slate-200 text-black"} 
+ border border-black p-1 my-[5px] mx-auto w-[80%] h-[50px]
+ hover:rounded-[10px] group
+ ` }>
+  <div
     className={`${active? "bg-slate-400 text-white rounded-[10px]":"bg-slate-200 text-black"} 
     w-full h-full
     border p-2 
@@ -47,8 +48,8 @@ hover:rounded-[10px] group
         <line x1="10" y1="10" x2="20" y2="5" stroke="black" />
         <line x1="10" y1="10" x2="20" y2="15" stroke="black" />
     </svg>
-    </button>
   </div>
+    </button>
 
 
     <div className={`${active?"max-h-[100px]":"max-h-0"} 

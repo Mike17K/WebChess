@@ -1,8 +1,31 @@
 import React, { useEffect, useState } from 'react'
 
-function Square({pos,whiteSide,piece}){
+function Square({pos,state,setState,whiteSide,piece}){
+        const [selected,setSelected] = useState(false);
+
+        useEffect(()=>{
+          if (state.selected.x === pos.x && state.selected.y === pos.y){
+              setSelected(true);
+            }else{
+            setSelected(false);
+          }
+        },[state.selected,pos]);
+
+    return <div
+    onClick={()=> {
+      if(state.selected.x === pos.x && state.selected.y === pos.y){
+        setState({...state,selected:{}})
+      }else{
+        if(piece) {
+          setState({...state,selected:pos}) 
+        }else{
+          // here check for posible target squares for a piece to go
+          setState({...state,selected:{}})
+        }
         
-    return <div className={`select-none relative flex justify-center align-middle w-[12.5%] aspect-square ${(pos.x+pos.y+1)%2===0 ?" bg-stone-600":"bg-white"}`}>
+      }
+    }}    
+    className={`select-none relative flex justify-center align-middle w-[12.5%] aspect-square ${(pos.x+pos.y+1)%2===0 ?`${selected?"bg-stone-800":"bg-stone-600"}`:`${selected?"bg-stone-200":"bg-white"}`}`}>
         <span className="absolute -bottom-0.5 right-1 text-[15px] font-semibold">
         {
             ((pos.y===1 && whiteSide ) || (pos.y===8 && !whiteSide )) && (['a','b','c','d','e','f','g','h'][pos.x-1])
@@ -24,7 +47,6 @@ function Square({pos,whiteSide,piece}){
 }
 
 function fenToPieceNamesArray(fen, board) {
-    console.log(fen);
     if(fen===undefined) return;
 
     const fenParts = fen.split(' ');
@@ -50,7 +72,6 @@ function fenToPieceNamesArray(fen, board) {
         colIndex++;
       }
     }
-    console.log(board);
   
   }
   
@@ -68,27 +89,29 @@ function fenToPieceNamesArray(fen, board) {
 
   export default function ChessBoard({fen,className,whiteSide}) {
       const [squares, setSquares] = useState([])
+      const [state, setState] = useState({selected:{}})
       
     useEffect(()=>{
+
         let sq=[];
         fenToPieceNamesArray(fen,board);
         if(!whiteSide){            
 
             for (let r = 1; r <=8; r++) {
                 for (let c = 8; c >=1; c--) {
-                    sq.push(<Square key={r*8+c} piece={board[(r-1)*8+c-1]} pos={{x: c, y: r}} whiteSide={whiteSide}/>);
+                    sq.push(<Square state={state} setState={setState} key={r*8+c} piece={board[(r-1)*8+c-1]} pos={{x: c, y: r}} whiteSide={whiteSide}/>);
                 }
             }
         }else{
             for (let r = 8; r >= 1; r--) {
                 for (let c = 1; c <=8; c++) {
-                    sq.push(<Square key={r*8+c} piece={board[(r-1)*8+c-1]} pos={{x: c, y: r}} whiteSide={whiteSide}/>);
+                    sq.push(<Square state={state} setState={setState} key={r*8+c} piece={board[(r-1)*8+c-1]} pos={{x: c, y: r}} whiteSide={whiteSide}/>);
                 }
             }
         }
  setSquares(sq)
 
-    },[whiteSide,fen])
+    },[whiteSide,fen,state])
 
   return (
     <>
