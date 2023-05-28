@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
+
+// TODO make dragable pieces
+let mouseDown = false;
+
+
 export function Square({pos,state,setState,whiteSide}){
         const piece = state.board[(pos.y-1)*8+pos.x-1];
         const [selected,setSelected] = useState(false);
@@ -20,28 +25,32 @@ export function Square({pos,state,setState,whiteSide}){
     onContextMenu={(e)=> e.preventDefault()} // disable right click menu
     
     onMouseDown={(event)=> {
-      console.log(state)
-      if (event.button === 0) { // Left-click detected
-        if(piece==="") return ;
-        if(state.selected.x===undefined || state.selected.y===undefined){
-          if(piece.substring(0,1) === (state.whiteIsPlaying?"b":"w")) return ; // keep the turn
-          // fetch the leagal moves from backend with api of stockfish TODO
-          const leagalMoves = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
-            16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
+        mouseDown = true;
+        
+        console.log(state)
+        if (event.button === 0) { // Left-click detected
+            if(piece==="") return ;
+            if(state.selected.x===undefined || state.selected.y===undefined){
+                if(piece.substring(0,1) === (state.whiteIsPlaying?"b":"w")) return ; // keep the turn
+                // fetch the leagal moves from backend with api of stockfish TODO
+                const leagalMoves = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+                    16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
             32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,
             48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
-          ]
-          setState({...state,leagalMoves:leagalMoves ,selected:{x:pos.x,y:pos.y}})
-        }
-      }else if (event.button === 2) { // Right-click detected 
-        // draw arrows logic here mouse down
-      }
-      
-    }}
-    
-    onMouseUp={(event)=> {
+        ]
+        setState({...state,leagalMoves:leagalMoves ,selected:{x:pos.x,y:pos.y}})
+    }
+}else if (event.button === 2) { // Right-click detected 
+    // draw arrows logic here mouse down
+}
+
+}}
+
+onMouseUp={(event)=> {
+    mouseDown = false;
+
     if (event.button === 0) { // Left-click detected
-      if(state.selected.x!==undefined && state.selected.y!==undefined){
+        if(state.selected.x!==undefined && state.selected.y!==undefined){
         if(state.selected.x!==pos.x || state.selected.y!==pos.y){ 
           // CHECK IF THE MOVE IS VALID with api of stockfish to backend then update state TODO
         
@@ -61,6 +70,15 @@ export function Square({pos,state,setState,whiteSide}){
     }
 
     }
+    }}
+
+    onMouseMove={(event)=> {
+        if(mouseDown){
+            // dragging element // it will be probably a better way to make the dragging with a useContext
+            const p = state.board[(state.selected.y-1)*8+state.selected.x-1];
+            ... make all this work with context and remove the dragging state from the squares 
+            and place them into the Chess board component
+        }
     }}
 
     
