@@ -4,16 +4,21 @@ import React, { useEffect, useState } from 'react'
 // TODO make dragable pieces
 let mouseDown = false;
 
-
 export function Square({pos,state,setState,whiteSide}){
+        const posString = JSON.stringify(pos);
         const piece = state.board[(pos.y-1)*8+pos.x-1];
         const [selected,setSelected] = useState(false);
+        const [highLighted,setHighLighted] = useState(false);
+
         const [leagalMove,setLeagalMove] = useState(false);
         const [itsCapture,setItsCapturePiece] = useState(false);
 
         useEffect(()=>{
+            setHighLighted(state.highLight.has(posString));
+        },[state,posString]);
+        
+        useEffect(()=>{
               setSelected(state.selected.x === pos.x && state.selected.y === pos.y);
-
         },[state.selected,pos]);
 
         useEffect(()=>{
@@ -25,9 +30,9 @@ export function Square({pos,state,setState,whiteSide}){
     onContextMenu={(e)=> e.preventDefault()} // disable right click menu
     
     onMouseDown={(event)=> {
+        console.log(state);
+
         mouseDown = true;
-        
-        console.log(state)
         if (event.button === 0) { // Left-click detected
             if(piece==="") return ;
             if(state.selected.x===undefined || state.selected.y===undefined){
@@ -48,36 +53,58 @@ export function Square({pos,state,setState,whiteSide}){
 
 onMouseUp={(event)=> {
     mouseDown = false;
-
+    let whiteIsPlaying=state.whiteIsPlaying;
+    let selected=state.selected;
+    let leagalMoves = state.leagalMoves;
+    let highLight=state.highLight;
+    
     if (event.button === 0) { // Left-click detected
         if(state.selected.x!==undefined && state.selected.y!==undefined){
-        if(state.selected.x!==pos.x || state.selected.y!==pos.y){ 
-          // CHECK IF THE MOVE IS VALID with api of stockfish to backend then update state TODO
-        
-          //console.log(state.leagalMoves,(state.selected.y-1)*8+state.selected.x-1)
-        
-          if(leagalMove){
-            state.board[(pos.y-1)*8+pos.x-1] = state.board[(state.selected.y-1)*8+state.selected.x-1];
-            state.board[(state.selected.y-1)*8+state.selected.x-1] = "";
-            setState({...state,whiteIsPlaying:!state.whiteIsPlaying,selected:{},leagalMoves:[]})
-          }else{
-            setState({...state,selected:{},leagalMoves:[]})
-          }
-        }
-      
-      }else if (event.button === 2) { // Right-click detected 
-      // draw arrows logic here mouse up
-    }
+            if(state.selected.x!==pos.x || state.selected.y!==pos.y){ 
+                // CHECK IF THE MOVE IS VALID with api of stockfish to backend then update state TODO
+                
+                //console.log(state.leagalMoves,(state.selected.y-1)*8+state.selected.x-1)
+                
+                if(leagalMove){
+                    state.board[(pos.y-1)*8+pos.x-1] = state.board[(state.selected.y-1)*8+state.selected.x-1];
+                    state.board[(state.selected.y-1)*8+state.selected.x-1] = "";
+                    whiteIsPlaying=!whiteIsPlaying;
+                    selected={};
+                    leagalMoves=[];
+                }else{
+                    selected={};
+                    leagalMoves=[];
+                }
+            }
+        }    
+        highLight.clear()
 
+        setState({...state,
+            whiteIsPlaying:whiteIsPlaying,
+            selected:selected,
+            leagalMoves:leagalMoves,
+            highLight:highLight})
+}else if (event.button === 2) { // Right-click detected 
+    // draw arrows logic here mouse up
+    if(state.highLight.has(posString)){
+        state.highLight.delete(posString);
+        setState({...state,highLight:state.highLight})
+    }else{
+        state.highLight.add(posString);
+        setState({...state,highLight:state.highLight})
     }
+}
+
     }}
 
     onMouseMove={(event)=> {
         if(mouseDown){
+            /* TODO
             // dragging element // it will be probably a better way to make the dragging with a useContext
             const p = state.board[(state.selected.y-1)*8+state.selected.x-1];
             ... make all this work with context and remove the dragging state from the squares 
             and place them into the Chess board component
+            */
         }
     }}
 
@@ -98,11 +125,13 @@ onMouseUp={(event)=> {
         
         <div className={`z-0 absolute
         ${leagalMove?
-            (itsCapture?`w-full h-full rounded-full border-8 
+            (itsCapture?`w-full h-full rounded-full border-[0.4rem]
         ${(pos.x+pos.y+1)%2===0 ?"border-capture-dark":"border-capture-light"}`:
         `${(pos.x+pos.y+1)%2===0 ?"bg-attack-dark":"bg-attack-light"}
         w-[30%] h-[30%] rounded-full top-[35%]
          `):""}`}></div>
+
+         <div className={`z-[1] absolute w-full h-full ${highLighted?`${(pos.x+pos.y+1)%2===0 ?`bg-red-dark`:`bg-red-light`}`:"bg-transparent"}`}></div>
         
         <div className='z-10 w-[100%] h-[100%] m-auto '>
         {

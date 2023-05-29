@@ -45,7 +45,9 @@ function fenToPieceNamesArray(fen, board) {
       "bR", "bN", "bB", "bK", "bQ", "bB", "bN", "bR",
     ],
     whiteIsPlaying:true,
-    leagalMoves:[]})
+    leagalMoves:[],
+    highLight:new Set([])
+  })
 
     
     useEffect(()=>{

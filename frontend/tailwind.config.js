@@ -16,6 +16,9 @@ module.exports = {
       'capture-light':'#d6d6bd',
       'attack-dark':'#6a874d',
       'attack-light':'#d6d6bd',
+      'red-dark':'#d46c51',
+      'red-light':'#ec7e6a',
+
 
 
     },
