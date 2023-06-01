@@ -4,9 +4,10 @@ import { Square } from "../Square/Square";
 function fenToPieceNamesArray(fen, board) {
   if (fen === undefined) return;
 
+  for (let i = 0; i < 64; i++) board[i] = "";
+
   const fenParts = fen.split(" ");
   const piecePlacement = fenParts[0];
-
   const rows = piecePlacement.split("/");
 
   for (let r = 0; r < rows.length; r++) {
@@ -23,7 +24,7 @@ function fenToPieceNamesArray(fen, board) {
         continue;
       }
 
-      board[8 * r + colIndex] =
+      board[8 * (7 - r) + colIndex] =
         (/[A-Z\W]/.test(char) ? "w" : "b") + char.toUpperCase();
       colIndex++;
     }
@@ -150,25 +151,29 @@ export default function ChessBoard({ fen, className, whiteSide }) {
     setSquares(sq);
   }, [whiteSide, state]);
 
+  function handleDraggable(e) {
+    if (!draggableRef.current) return;
+
+    const containerRect = e.currentTarget.getBoundingClientRect();
+    const offsetX = e.clientX - containerRect.left;
+    const offsetY = e.clientY - containerRect.top;
+
+    const draggableElement = draggableRef.current;
+    draggableElement.style.left = offsetX + "px";
+    draggableElement.style.top = offsetY + "px";
+    draggableElement.style.cursor = "grab";
+    draggableElement.style.height = "12.5%";
+    console.log("apply");
+    draggableRef.current.style.zIndex = 10;
+  }
+
   return (
     <>
       <div
         className={`border-black relative mx-auto my-3 flex
     aspect-square w-full flex-wrap justify-center border-4 bg-white align-middle ${className}`}
         onMouseMove={(e) => {
-          console.log(draggableRef.current, state.draggingPiece);
-          if (!draggableRef.current) return;
-
-          const containerRect = e.currentTarget.getBoundingClientRect();
-          const offsetX = e.clientX - containerRect.left;
-          const offsetY = e.clientY - containerRect.top;
-
-          const draggableElement = draggableRef.current;
-          draggableElement.style.left = offsetX + "px";
-          draggableElement.style.top = offsetY + "px";
-          draggableElement.style.cursor = "grab";
-
-          draggableRef.current.style.zIndex = 10;
+          handleDraggable(e);
         }}
       >
         {state.draggingPiece.id !== "" && (
@@ -179,7 +184,7 @@ export default function ChessBoard({ fen, className, whiteSide }) {
               `/assets/pieces/${state.draggingPiece.piece}.png`
             }
             alt="piece icon"
-            className="h-1/8 w-1/8 absolute top-10 -z-10 -translate-x-1/2 -translate-y-1/2"
+            className="w-1/8 absolute h-0 -translate-x-1/2 -translate-y-1/2"
           />
         )}
         {squares}

@@ -136,7 +136,7 @@ export function Square({ pos, state, setState, whiteSide }) {
       }}
       className={`relative flex aspect-square w-[12.5%] select-none justify-center align-middle 
     ${
-      (pos.x + pos.y + 1) % 2 === 0
+      (pos.x + pos.y) % 2 === 0
         ? selected
           ? "bg-green-light"
           : "bg-green-dark"
@@ -161,12 +161,12 @@ export function Square({ pos, state, setState, whiteSide }) {
             ? itsCapture
               ? `h-full w-full rounded-full border-[0.4rem]
         ${
-          (pos.x + pos.y + 1) % 2 === 0
+          (pos.x + pos.y) % 2 === 0
             ? "border-capture-dark"
             : "border-capture-light"
         }`
               : `${
-                  (pos.x + pos.y + 1) % 2 === 0
+                  (pos.x + pos.y) % 2 === 0
                     ? "bg-attack-dark"
                     : "bg-attack-light"
                 }
@@ -179,9 +179,7 @@ export function Square({ pos, state, setState, whiteSide }) {
       <div
         className={`absolute z-[1] h-full w-full ${
           highLighted
-            ? `${
-                (pos.x + pos.y + 1) % 2 === 0 ? `bg-red-dark` : `bg-red-light`
-              }`
+            ? `${(pos.x + pos.y) % 2 === 0 ? `bg-red-dark` : `bg-red-light`}`
             : "bg-transparent"
         }`}
       ></div>
