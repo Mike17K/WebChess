@@ -9,7 +9,7 @@ export default function MainScreen({ className, tactic }) {
   useEffect(() => {
     // instead of manual fetch data from server and pase them to the main screen from tactic.endpoint
     const res = {
-      fen: "rnbqkbnr/ppp1pppp/8/4P3/4p3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1",
+      fen: "rnbqkb1r/pp2pp1p/3p1np1/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 1",
       hints: "7...Q",
       title: tactic.title,
       titleCategory: tactic.titleCategory,

@@ -10,6 +10,7 @@ function fenToPieceNamesArray(fen, board) {
   const piecePlacement = fenParts[0];
   const rows = piecePlacement.split("/");
 
+  // "rnbqkb1r/pp2pp1p/3p1np1/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 1"
   for (let r = 0; r < rows.length; r++) {
     let colIndex = 0;
 
@@ -18,7 +19,7 @@ function fenToPieceNamesArray(fen, board) {
 
       if (!isNaN(parseInt(char, 10))) {
         for (let i = 0; i < parseInt(char, 10); i++) {
-          board[8 * r + colIndex] = "";
+          board[8 * (7 - r) + colIndex] = "";
           colIndex++;
         }
         continue;
@@ -163,7 +164,6 @@ export default function ChessBoard({ fen, className, whiteSide }) {
     draggableElement.style.top = offsetY + "px";
     draggableElement.style.cursor = "grab";
     draggableElement.style.height = "12.5%";
-    console.log("apply");
     draggableRef.current.style.zIndex = 10;
   }
 

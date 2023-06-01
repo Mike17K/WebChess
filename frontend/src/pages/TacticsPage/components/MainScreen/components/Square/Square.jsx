@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-// TODO make dragable pieces
-let mouseDown = false;
-
 export function Square({ pos, state, setState, whiteSide }) {
   const posString = JSON.stringify(pos);
   const piece = state.board[(pos.y - 1) * 8 + pos.x - 1];
@@ -31,9 +28,12 @@ export function Square({ pos, state, setState, whiteSide }) {
     <div
       onContextMenu={(e) => e.preventDefault()} // disable right click menu
       onMouseDown={(event) => {
-        console.log(state);
+        let whiteIsPlaying = state.whiteIsPlaying;
+        let selected = state.selected;
+        let leagalMoves = state.leagalMoves;
+        let draggingPiece = state.draggingPiece;
+        let highLight = state.highLight;
 
-        mouseDown = true;
         if (event.button === 0) {
           // Left-click detected
           if (piece === "") return;
@@ -41,9 +41,7 @@ export function Square({ pos, state, setState, whiteSide }) {
             state.selected.x === undefined ||
             state.selected.y === undefined
           ) {
-            if (piece.substring(0, 1) === (state.whiteIsPlaying ? "b" : "w"))
-              return; // keep the turn
-            // fetch the leagal moves from backend with api of stockfish TODO
+            // fetch the leagal moves from backend with api of stockfish TODO // the api should be watching for the move order
             const leagalMoves = [
               0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
               19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
@@ -57,10 +55,36 @@ export function Square({ pos, state, setState, whiteSide }) {
               selected: { x: pos.x, y: pos.y },
             });
           } else {
+            // replace the move piece logic  of the board with a function same as mouse up TODO
+            if (state.selected.x === pos.x && state.selected.y === pos.y) {
+              selected = {};
+              leagalMoves = [];
+              highLight.clear();
+            } else if (
+              state.leagalMoves.includes((pos.y - 1) * 8 + pos.x - 1)
+            ) {
+              state.board[(pos.y - 1) * 8 + pos.x - 1] =
+                state.board[(state.selected.y - 1) * 8 + state.selected.x - 1];
+              state.board[(state.selected.y - 1) * 8 + state.selected.x - 1] =
+                "";
+              whiteIsPlaying = !whiteIsPlaying; // this will be updated from the server not manualy
+              selected = {};
+              leagalMoves = [];
+              highLight.clear();
+            } else {
+              selected = { x: pos.x, y: pos.y };
+              leagalMoves = [];
+              draggingPiece = { id: posString, piece: piece };
+              // fetch new moves and update the leagalMoves
+            }
+
             setState({
               ...state,
-              selected: { x: pos.x, y: pos.y },
-              draggingPiece: { id: posString, piece: piece },
+              draggingPiece: draggingPiece,
+              whiteIsPlaying: whiteIsPlaying,
+              selected: selected,
+              leagalMoves: leagalMoves,
+              highLight: highLight,
             });
           }
         } else if (event.button === 2) {
@@ -69,7 +93,6 @@ export function Square({ pos, state, setState, whiteSide }) {
         }
       }}
       onMouseUp={(event) => {
-        mouseDown = false;
         let whiteIsPlaying = state.whiteIsPlaying;
         let selected = state.selected;
         let leagalMoves = state.leagalMoves;
@@ -86,14 +109,14 @@ export function Square({ pos, state, setState, whiteSide }) {
 
               //console.log(state.leagalMoves,(state.selected.y-1)*8+state.selected.x-1)
 
-              if (leagalMove) {
+              if (state.leagalMoves.includes((pos.y - 1) * 8 + pos.x - 1)) {
                 state.board[(pos.y - 1) * 8 + pos.x - 1] =
                   state.board[
                     (state.selected.y - 1) * 8 + state.selected.x - 1
                   ];
                 state.board[(state.selected.y - 1) * 8 + state.selected.x - 1] =
                   "";
-                whiteIsPlaying = !whiteIsPlaying;
+                whiteIsPlaying = !whiteIsPlaying; // this will be updated from the server not manualy
                 selected = {};
                 leagalMoves = [];
               } else {
@@ -122,16 +145,6 @@ export function Square({ pos, state, setState, whiteSide }) {
             state.highLight.add(posString);
             setState({ ...state, highLight: state.highLight });
           }
-        }
-      }}
-      onMouseMove={(event) => {
-        if (mouseDown) {
-          /* TODO
-            // dragging element // it will be probably a better way to make the dragging with a useContext
-            const p = state.board[(state.selected.y-1)*8+state.selected.x-1];
-            ... make all this work with context and remove the dragging state from the squares 
-            and place them into the Chess board component
-            */
         }
       }}
       className={`relative flex aspect-square w-[12.5%] select-none justify-center align-middle 
