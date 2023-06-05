@@ -22,6 +22,7 @@
     "express-session": "^1.17.3",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.22",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "stockfish": "^15.0.0"
   }
 }

@@ -36,6 +36,7 @@ const Api = await import('../api/api.js');
 router.get('/api/:enginename/getLeagalMoves/:fen', Api.getLeagalMoves);
 
 // /api/:enginename/getEvaluation/:fen
+router.get('/api/:enginename/getEvaluation/:fen', Api.getEvaluation);
 
 
 

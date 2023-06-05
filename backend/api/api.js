@@ -21,6 +21,21 @@ export async function getLeagalMoves(req, res) {
     });
 }
 
+// getEvaluation // url: /api/:enginename/getEvaluation/:fen
+export async function getEvaluation(req, res) {
+    if (!validateObj(req.params, ["enginename", "fen"])) return;
+    const { enginename, fen } = req.params;
+    if (!availableEngines.includes(enginename)) return res.json({ errorMessage: "Engine not supported" });
+    const engineController = controllers[enginename];
+    // get results
+    const evaluation = await engineController.getEvaluation(fen);
+    console.log("Sending Leagal Moves");
+    // send results
+    res.json({
+        res: evaluation
+    });
+}
+
 
 // testing 
 export async function test(req, res) {
