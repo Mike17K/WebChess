@@ -18,3 +18,7 @@ async function query(query, values) {
         return "ERROR";
     }
 }
+
+export async function getLeagalMoves(fen) {
+    return 1; //TODO implementation
+}
