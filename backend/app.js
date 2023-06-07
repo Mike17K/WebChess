@@ -35,7 +35,7 @@ app.use(express.static('public'));
 
 app.use(router);
 
-app.listen(3000, () => {
-    console.log('Web server started at post 3000...');
+app.listen(5050, () => {
+    console.log('Web server started at post 5050...');
 });
 
