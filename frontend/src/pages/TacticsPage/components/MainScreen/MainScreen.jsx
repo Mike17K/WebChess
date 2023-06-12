@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from "react";
 import ChessBoard from "./components/ChessBoard/ChessBoard";
 
+const initDataState = {
+  fen: "rnbqkb1r/pp2pp1p/3p1np1/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 1",
+  hints: "7...Q",
+  title: "init",
+  titleCategory: "test",
+  tacticInfo: "Simons - Lowe, London 1849",
+  solution: "7...Qa5+ 0-1",
+  comments: "Black checks to capture the undefended bishop.",
+  isWhiteTurn: false,
+};
+
 export default function MainScreen({ className, tactic }) {
-  const [data, setData] = useState({});
+  const [data, setData] = useState(initDataState);
   const [solutinoShow, setSolutinoShow] = useState(false);
   const [whiteSide, setWhiteSide] = useState(true);
 

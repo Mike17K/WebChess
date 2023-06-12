@@ -1,0 +1,27 @@
+
+
+.bg-red-highlight-dark{
+    background-color: #d35d49;
+}
+.bg-red-highlight-light{
+background-color: #e06a51;
+}
+.bg-yellow-highlight-dark{
+background-color: #e69b0b;
+}
+.bg-yellow-highlight-light{
+background-color: #f6ac1c;
+}
+.bg-green-highlight-dark{
+background-color: #a5b854;
+}
+.bg-green-highlight-light{
+background-color: #b1c65d;
+}
+
+.bg-blue-highlight-dark{
+background-color: #5b9eba;
+}
+.bg-blue-highlight-light{
+background-color: #68aec6;
+}

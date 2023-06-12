@@ -18,8 +18,9 @@ const Api = await import('../api/api.js');
 // /api/updateUser
 // 
 // {logged in}
-// /api/newGame/ -> returns secret code that is stored from client and when he calls /api/newGame/addMove sends this key for knowing in what game you are refering to
-// /api/newGame/addMove?gameKey=
+// /api/game/newGame -> returns secret code that is stored from client and when he calls /api/newGame/addMove sends this key for knowing in what game you are refering to
+// /api/game/addMove
+
 // 
 // /api/game/:gameid -> returns the game requested in the desired format (TODO think about the format)
 // /api/user/:userid -> returns the information about a user
@@ -33,10 +34,10 @@ const Api = await import('../api/api.js');
 // 
 // {general}
 // /api/:enginename/getLeagalMoves/:fen
-router.get('/api/:enginename/getLeagalMoves/:fen', Api.getLeagalMoves);
+router.post('/api/:enginename/getLeagalMoves', Api.getLeagalMoves); // has to have a body with fen
 
 // /api/:enginename/getEvaluation/:fen
-router.get('/api/:enginename/getEvaluation/:fen', Api.getEvaluation);
+router.post('/api/:enginename/getEvaluation', Api.getEvaluation); // has to have a body with fen
 
 
 

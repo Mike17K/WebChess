@@ -9,9 +9,9 @@ export default function Category({name,uid,setTactic}) {
 
         //instead of manualy fetch the subcategories and set the Children
         const data = [            
-            {titleCategory:name,title:'Diagram 1',endpoint:"/tactic/05557568"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/tactic/0482248455"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/tactic/0482248455"},
+            {titleCategory:name,title:'Diagram 1',endpoint:"/tactic/0005557568"},
+            {titleCategory:name,title:'Diagram 2',endpoint:"/tactic/4842248455"},
+            {titleCategory:name,title:'Diagram 2',endpoint:"/tactic/4827248455"},
             {titleCategory:name,title:'Diagram 2',endpoint:"/tactic/0482248415"},
             {titleCategory:name,title:'Diagram 2',endpoint:"/tactic/0482248425"},
             {titleCategory:name,title:'Diagram 2',endpoint:"/tactic/0482248435"},

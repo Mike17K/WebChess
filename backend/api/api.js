@@ -6,33 +6,35 @@ const { controllers } = await import(`../controllers/index.js`);
 
 // Routes Functions
 
-// getLeagalMoves // url: /api/:enginename/getLeagalMoves/:fen
+// getLeagalMoves // url: /api/:enginename/getLeagalMoves has to have a body with fen
 export async function getLeagalMoves(req, res) {
-    if (!validateObj(req.params, ["enginename", "fen"])) return;
-    const { enginename, fen } = req.params;
+    if (!validateObj(req.params, ["enginename"])) return;
+    const { enginename } = req.params;
     if (!availableEngines.includes(enginename)) return res.json({ errorMessage: "Engine not supported" });
     const engineController = controllers[enginename];
+    if(req.body.fen === undefined) return res.json({ errorMessage: "fen not provided" } );
     // get results
-    const leagalMoves = await engineController.getLeagalMoves(fen);
+    const leagalMoves = await engineController.getLeagalMoves(req.body.fen);
     console.log("Sending Leagal Moves");
     // send results
     res.json({
-        res: leagalMoves
+        leagalMoves: leagalMoves
     });
 }
 
-// getEvaluation // url: /api/:enginename/getEvaluation/:fen
+// getEvaluation // url: /api/:enginename/getEvaluation has to have a body with fen
 export async function getEvaluation(req, res) {
-    if (!validateObj(req.params, ["enginename", "fen"])) return;
-    const { enginename, fen } = req.params;
+    if (!validateObj(req.params, ["enginename"])) return;
+    const { enginename } = req.params;
     if (!availableEngines.includes(enginename)) return res.json({ errorMessage: "Engine not supported" });
     const engineController = controllers[enginename];
+    if(req.body.fen === undefined) return res.json({ errorMessage: "fen not provided" } );
     // get results
-    const evaluation = await engineController.getEvaluation(fen);
+    const evaluation = await engineController.getEvaluation(req.body.fen);
     console.log("Sending Leagal Moves");
     // send results
     res.json({
-        res: evaluation
+        evaluation: evaluation
     });
 }
 

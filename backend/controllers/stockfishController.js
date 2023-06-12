@@ -65,11 +65,12 @@ var completionsMid = [
 */
 
 const stockfish = new Stockfish();
+console.log(stockfish)
 // stockfish.postMessage("setoption name Skill Level value 20");
 stockfish.onMessage = (event) => {
     console.log("Stockfish says: " + event);
 };
-
+/*
 stockfish.onMessage = (event) => {
     if (event === 'Stockfish.js ready') {
         // Stockfish engine is ready, you can now use postMessage
@@ -77,24 +78,27 @@ stockfish.onMessage = (event) => {
     }
 };
 
-// stockfish.postMessage("position startpos");
-// stockfish.postMessage("go movetime 1000");
+stockfish.postMessage("position startpos");
+stockfish.postMessage("go movetime 1000");
 
-// engine.onmessage = (data) => {
-//     console.log(data)
-//     data = data + ''
-//     if (data.startsWith('Fen:')) {
-//         fen = data.split(':')[1].trim()
-//         const curTurn = data.split(' ')[2]
-//     }
-//     if (data == 'info depth 0 score mate 0') {
-//         console.log('win!');
-//     }
-// }
-
+engine.onmessage = (data) => {
+    console.log(data)
+    data = data + ''
+    if (data.startsWith('Fen:')) {
+        fen = data.split(':')[1].trim()
+        const curTurn = data.split(' ')[2]
+    }
+    if (data == 'info depth 0 score mate 0') {
+        console.log('win!');
+    }
+}
+*/
 
 export async function getLeagalMoves(fen) {
-    return 1; //TODO implementation
+    // res {
+    //  piecePos: [targetsPos]   
+    // }
+    return {a1: [6,8,12], b1: [10,55,60]}; //TODO implementation
 }
 
 export async function getEvaluation(fen) {
