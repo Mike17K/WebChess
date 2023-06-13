@@ -33,10 +33,10 @@ const Api = await import('../api/api.js');
 // /api/:enginename/topMoves?fen=&&depth=&&limit=
 // 
 // {general}
-// /api/:enginename/getLeagalMoves/:fen
-router.post('/api/:enginename/getLeagalMoves', Api.getLeagalMoves); // has to have a body with fen
+// /api/getLeagalMoves
+router.post('/api/getLeagalMoves', Api.getLeagalMoves); // has to have a body with fen
 
-// /api/:enginename/getEvaluation/:fen
+// /api/:enginename/getEvaluation
 router.post('/api/:enginename/getEvaluation', Api.getEvaluation); // has to have a body with fen
 
 

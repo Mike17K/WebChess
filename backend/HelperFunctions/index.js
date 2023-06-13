@@ -38,3 +38,52 @@ export function validateObj(obj, fields = []) {
         return false;
     }
 }
+
+export function fenToBoard(fen) {
+    // This function converts a fen string to a board array
+    const pieces = {p:"bP", n:"bN", b:"bB", r:"bR", q:"bQ", k:"bK", P:"wP", N:"wN", B:"wB", R:"wR", Q:"wQ", K:"wK"};
+    const board = [];
+    fen = fen.split(" ")[0];
+    for(let i = 0; i <8; i++) {
+        for(let j = 0; j <8; j++) {
+            board.push("");
+        }
+    }
+    let i = 0;
+    let j = 7;
+    for(let s=0; s<fen.length; s++) {
+        if(fen[s] === "/"){
+            i=0;
+            j--;
+        }
+        else if(!isNaN(fen[s])) {
+            i += parseInt(fen[s]);
+        }
+        else {
+            board[i+j*8] = pieces[fen[s]];
+            i++;
+        }
+    }
+    return board;
+}
+
+export function showBoard(board){
+    // This function prints the board in the console
+    let str = "";
+    str += "\n";
+    const pieces = {bP:"♟", bN:"♞", bB:"♝", bR:"♜", bQ:"♛", bK:"♚", wP:"♙", wN:"♘", wB:"♗", wR:"♖", wQ:"♕", wK:"♔"};
+
+    for(let i = 7; i>=0; i--) {
+        str += "\n"+(i+1)+" | ";
+        for(let j = 0; j <8; j++) {
+            if(board[i*8+j]==="") str += ". ";
+            else{
+                str += pieces[board[i*8+j]] + " ";
+            }
+        }
+        str += "|";
+    }
+    str += "\n    a b c d e f g h";
+    str += "\n";
+    console.log(str);
+}

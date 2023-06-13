@@ -6,11 +6,9 @@ const { controllers } = await import(`../controllers/index.js`);
 
 // Routes Functions
 
-// getLeagalMoves // url: /api/:enginename/getLeagalMoves has to have a body with fen
+// getLeagalMoves // url: /api/getLeagalMoves has to have a body with fen
 export async function getLeagalMoves(req, res) {
-    if (!validateObj(req.params, ["enginename"])) return;
-    const { enginename } = req.params;
-    if (!availableEngines.includes(enginename)) return res.json({ errorMessage: "Engine not supported" });
+    const enginename = "simpleEngine"
     const engineController = controllers[enginename];
     if(req.body.fen === undefined) return res.json({ errorMessage: "fen not provided" } );
     // get results

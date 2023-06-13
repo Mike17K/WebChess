@@ -98,6 +98,7 @@ export async function getLeagalMoves(fen) {
     // res {
     //  piecePos: [targetsPos]   
     // }
+    
     return {a1: [6,8,12], b1: [10,55,60]}; //TODO implementation
 }
 

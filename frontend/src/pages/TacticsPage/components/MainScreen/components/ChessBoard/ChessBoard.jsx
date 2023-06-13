@@ -115,7 +115,7 @@ export default function ChessBoard({ fen, className, whiteSide }) {
     let tmp_board = [];
     fenToPieceNamesArray(fen, tmp_board);
 
-    fetch(`http://localhost:5050/api/stockfish/getLeagalMoves`, {
+    fetch(`http://localhost:5050/api/getLeagalMoves`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
