@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Square } from "../Square/Square";
+import { Square } from "./components/Square/Square";
 
 function fenToPieceNamesArray(fen, board) {
   if (fen === undefined) return;
@@ -111,7 +111,6 @@ export default function ChessBoard({ fen, className, whiteSide }) {
   });
 
   useEffect(() => {
-    // TODO request from server the creation of new game
     let tmp_board = [];
     fenToPieceNamesArray(fen, tmp_board);
 

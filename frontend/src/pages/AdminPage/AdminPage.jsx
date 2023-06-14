@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import ChessBoard from '../../components/ChessBoard/ChessBoard';
 
 export default function AdminPage() {
         // get categories
         const [categories, setCategories] = useState([]);
+        const [fen,setFen] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        const fenRef = useRef();
+
         useEffect(() => {
                 fetch('http://localhost:5050/api/tactic/getCategories')
                 .then(response => response.json())
@@ -13,7 +17,6 @@ export default function AdminPage() {
                         console.log(error);
                 });
         }, []);
-
 
   return (
     <>
@@ -54,7 +57,7 @@ export default function AdminPage() {
             <label htmlFor="fen">FEN</label>
                     </th>
                     <th>
-            <input type="text" name="fen" placeholder="rnbqkb1r/pp2pp1p/3p1np1/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 1" />
+            <input type="text" name="fen" ref={fenRef} onChange={(e)=> setFen(fenRef.current.value)} placeholder="rnbqkb1r/pp2pp1p/3p1np1/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 1" />
                     </th>
                 </tr>
                 <tr>
@@ -95,6 +98,9 @@ export default function AdminPage() {
                     <button type="submit">Submit</button>
         </form>
 
+        <div className="w-[70%] mx-auto">
+        <ChessBoard fen={fen} whiteSide={true} />
+        </div>
     </>
   )
 }
