@@ -168,7 +168,8 @@ function generateMoves(pieceType, piecePos,board,fen){
     if(pieceType === 'Q') return generateMoves_Queen(piecePos,board);
     if(pieceType === 'K') return generateMoves_King(piecePos,board,fen);
     
-    // TODO implementation of leagal moves
+    // TODO implementation of leagal moves check for checks
+    
     return []; // returns array
 }    
 
@@ -178,7 +179,7 @@ export async function getLeagalMoves(fen) {
     // }
     const whiteToPlay = fen.split(' ')[1] === 'w';
     const board = fenToBoard(fen);
-    showBoard(board);
+    //showBoard(board);
 
     const leagalMoves = {};
     for(let i = 0; i < 64; i++) {

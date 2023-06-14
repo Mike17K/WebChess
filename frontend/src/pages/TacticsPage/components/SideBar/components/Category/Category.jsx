@@ -6,25 +6,22 @@ export default function Category({name,uid,setTactic}) {
 
     useEffect(()=>{
         if(!active) return;
+        if(tactics.length > 0) return; // if alrdy fetched return
 
-        // TODO instead of manualy fetch the subcategories and set the Children
-        const data = [            
-            {titleCategory:name,title:'Diagram 1',endpoint:"/api/tactic/0005557568"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/4842248455"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/4827248455"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/0482248415"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/0482248425"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/0482248435"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/04822484345"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/0482248457"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/0482248458"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/0482248456"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/0482248455"},
-            {titleCategory:name,title:'Diagram 2',endpoint:"/api/tactic/0482248459"},
-        ];
-        setTactics(data);
+        fetch(`http://localhost:5050/api/tactic/getCategoryTactics`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          titleCategory:`${name}`
+        })}
+        ).then(res => res.json()).then(data => {
+            setTactics(data.tactics);
+        }).catch(err => console.log(err));
 
-    },[active,name]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[active]);
 
   return (
     <>

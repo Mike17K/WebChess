@@ -13,7 +13,6 @@ export async function getLeagalMoves(req, res) {
     if(req.body.fen === undefined) return res.json({ errorMessage: "fen not provided" } );
     // get results
     const leagalMoves = await engineController.getLeagalMoves(req.body.fen);
-    console.log("Sending Leagal Moves");
     // send results
     res.json({
         leagalMoves: leagalMoves
@@ -29,7 +28,6 @@ export async function getEvaluation(req, res) {
     if(req.body.fen === undefined) return res.json({ errorMessage: "fen not provided" } );
     // get results
     const evaluation = await engineController.getEvaluation(req.body.fen);
-    console.log("Sending Leagal Moves");
     // send results
     res.json({
         evaluation: evaluation
@@ -39,7 +37,7 @@ export async function getEvaluation(req, res) {
 // /api/tactic/:tacticid -> retuns all the info about the tactic requested as fen,solution,explenation
 export async function getTactic(req, res) {
     const { tacticid } = req.params;
-    // get results from db
+    // TODO get results from db
     const tactic = {
         fen: "rnbqkb1r/pp2pp1p/3p1np1/8/3NP3/2N5/PPP2PPP/R1BQKB1R b KQkq - 0 1",
         hints: "7...Q",
@@ -55,6 +53,45 @@ export async function getTactic(req, res) {
         tactic: tactic
     });  
 }
+
+// /api/tactic/:titleCategory/getTactics -> retuns all the tactics in the category
+export async function getCategoryTactics(req, res) {
+    const { titleCategory } = req.body;
+    // TODO get results from db
+    const tactics =  [            
+        {titleCategory:titleCategory,title:'Diagram 1',endpoint:"/api/tactic/id/0005557568"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/4842248455"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/4827248455"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/0482248415"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/0482248425"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/0482248435"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/04822484345"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/0482248457"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/0482248458"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/0482248456"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/0482248455"},
+        {titleCategory:titleCategory,title:'Diagram 2',endpoint:"/api/tactic/id/0482248459"},
+    ]
+    // send results
+    res.json({
+        tactics: tactics
+    });
+}
+
+// /api/tactic/getCategories -> retuns all the categories of the tatics available
+export async function getCategories(req, res) {
+    // TODO get results from db
+    const categories = [
+        {uid:"5688562418",name:"B20 - 1.e4 c5"},
+        {uid:"5456785136",name:"B21 - 2.f4"},
+        {uid:"5456745436",name:"B22 - 2.c3 d5"}
+    ];
+    // send results
+    res.json({
+        categories: categories
+    });
+}
+
 
 // testing 
 export async function test(req, res) {

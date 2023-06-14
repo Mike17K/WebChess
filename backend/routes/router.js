@@ -26,7 +26,11 @@ const Api = await import('../api/api.js');
 // /api/user/:userid -> returns the information about a user
 // 
 // /api/tactic/:tacticid -> retuns all the info about the tactic requested as fen,solution,explenation
-router.get('/api/tactic/:tacticid', Api.getTactic);
+router.get('/api/tactic/id/:tacticid', Api.getTactic);
+
+// /api/tactic/getCategories -> retuns all the categories of the tatics available
+router.get('/api/tactic/getCategories', Api.getCategories); 
+router.post('/api/tactic/getCategoryTactics', Api.getCategoryTactics); // has to contain a body with a titleCategory field
 
 
 
