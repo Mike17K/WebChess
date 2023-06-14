@@ -1,5 +1,3 @@
-import { connect, disconnect } from './models/mysql/database.mjs';
-connect();
 import express from 'express';
 
 import { router } from './routes/router.js';

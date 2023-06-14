@@ -1,5 +1,8 @@
 import { validateUser, addUser, deleteUser } from '../models/mysql/db_functions.mjs';
 import { validateObj } from '../HelperFunctions/index.js';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient()
 
 const availableEngines = ['stockfish'];
 const { controllers } = await import(`../controllers/index.js`);
