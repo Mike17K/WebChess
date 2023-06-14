@@ -1,11 +1,27 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 export default function AdminPage() {
+        // get categories
+        const [categories, setCategories] = useState([]);
+        useEffect(() => {
+                fetch('http://localhost:5050/api/tactic/getCategories')
+                .then(response => response.json())
+                .then(data => {
+                        setCategories(data.categories);
+                })
+                .catch(error => {
+                        console.log(error);
+                });
+        }, []);
+
+
   return (
     <>
         <div>AdminPage</div>
+        <br />
+        <h1>Add a tactic</h1>
 
-        <form action="http://localhost:5050/api/tactic/addTactic" method="post">
+        <form action="http://localhost:5050/api/tactic/addTactic" method="post" className='border'>
         <table >
             <tbody>
                 <tr>
@@ -13,7 +29,16 @@ export default function AdminPage() {
                     <label htmlFor="titleCategory">Category Name</label>
                     </th>
                     <th>
-                    <input type="text" name="titleCategory" placeholder="B21 - 2.f4" />
+                    <select name="titleCategory">
+                        {
+                                categories.map((category, index) => {
+                                        return (
+                                                <option key={index} value={category.name}>{category.name}</option>
+                                        )
+                                        }
+                                )
+                        }
+                    </select>
                     </th>
                 </tr>
                 <tr>
