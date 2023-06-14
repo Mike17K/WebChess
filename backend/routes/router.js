@@ -26,7 +26,10 @@ const Api = await import('../api/api.js');
 // /api/user/:userid -> returns the information about a user
 // 
 // /api/tactic/:tacticid -> retuns all the info about the tactic requested as fen,solution,explenation
-// 
+router.get('/api/tactic/:tacticid', Api.getTactic);
+
+
+
 // {engine api routes}
 // /api/:enginename/info -> returns the info about the engine requested
 // /api/:enginename/eval?fen=&&depth=

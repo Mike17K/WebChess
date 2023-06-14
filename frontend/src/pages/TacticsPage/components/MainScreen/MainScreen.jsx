@@ -18,21 +18,11 @@ export default function MainScreen({ className, tactic }) {
   const [whiteSide, setWhiteSide] = useState(true);
 
   useEffect(() => {
-    // instead of manual fetch data from server and pase them to the main screen from tactic.endpoint
-    const res = {
-      fen: "rnbqkb1r/pp2pp1p/3p1np1/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 1",
-      hints: "7...Q",
-      title: tactic.title,
-      titleCategory: tactic.titleCategory,
-      tacticInfo: "Simons - Lowe, London 1849",
-      solution: "7...Qa5+ 0-1",
-      comments: "Black checks to capture the undefended bishop.",
-      isWhiteTurn: false,
-    };
-    setData(res);
-    console.log(tactic);
+    console.log("Fetching tactic from: ",tactic.endpoint);
+    if(tactic.endpoint === undefined) return;
+    fetch(`http://localhost:5050${tactic.endpoint}`, { method: "GET" }).then((res) => res.json()).then((res) => {setData(res.tactic)}).catch((err) => console.log(err));
   }, [tactic]);
-
+  
   return (
     <div
       className={`${className} flex w-full max-w-2xl flex-col p-10 align-middle`}
@@ -41,7 +31,7 @@ export default function MainScreen({ className, tactic }) {
         {data.titleCategory}
       </h2>
       <h3 className="text-center font-serif text-[20px] font-semibold">
-        {data.title} - {data.isWhiteTurn ? "White" : "Black"} to play
+        {data.title} - {data.fen.split(' ')[1]==='w' ? "White" : "Black"} to play
       </h3>
 
       <ChessBoard fen={data.fen} whiteSide={whiteSide} />

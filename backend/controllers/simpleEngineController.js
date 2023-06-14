@@ -3,6 +3,9 @@ import { fenToBoard, showBoard } from '../HelperFunctions/index.js';
 const sqName = (id) =>{return `${['a','b','c','d','e','f','g','h'][id%8]}${Math.floor(id/8)+1}`;}; // input 0 output "a1"
 const sqId = (name) =>{return ['a','b','c','d','e','f','g','h'].indexOf(name[0])*8+parseInt(name[1])-1;}; // input "a1" output 0
 
+// TODO fix the boundaries isues !!
+// TODO fix the check !!
+
 // posible moves semi-legal
 function generateMoves_Pawn(piecePos,board,fen){
     // piecePos = 0-63
