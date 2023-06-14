@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-export default function Category({name,uid,setTactic}) {
+export default function Category({name,id,setTactic}) {
     const [active,setActive] = useState(false);
     const [tactics,setTactics] = useState([]);
 
@@ -25,7 +25,7 @@ export default function Category({name,uid,setTactic}) {
 
   return (
     <>
- <button key={uid} onClick={()=> setActive(!active)} 
+ <button key={id} onClick={()=> setActive(!active)} 
  className={`relative ${active? "bg-slate-700 text-white rounded-[10px]":"bg-slate-200 text-black"} 
  border border-black p-1 my-[5px] mx-auto w-[80%] h-[50px]
  hover:rounded-[10px] group

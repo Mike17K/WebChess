@@ -1,3 +1,4 @@
+/*
 import { validateUser, addUser } from '../models/mysql/db_functions.mjs';
 
 export const loggedIn = (req, res, next) => {
@@ -80,3 +81,11 @@ export const logout = (req, res) => {
     req.session.destroy((err) => { console.log("session destroyed") });
     res.redirect('/');
 }
+
+// TODO fix the functions to work with prisma
+// FIX TODO we are not working with handlebars anymore
+export const adminPipe = [loggedIn, isAdmin, (req, res) => {
+    res.render('pages/admin', { style: 'admin.css', title: "admin page", script: "admin.js", isLogedIn: true });}];
+    
+*/
+

@@ -1,17 +1,13 @@
 import express from 'express';
 export const router = express.Router();
-import {
-    signin,
-    signup,
-    logout,
-    loginPipe,
-    registerPipe
-} from './piplines.js';
 
+const piplines = await import('./piplines.js');
 const Api = await import('../api/api.js');
 
 
 // routes
+// /admin
+// router.get('/admin', piplines.adminPipe);??????????
 
 // /api/addUser
 // /api/delUser
@@ -27,6 +23,8 @@ const Api = await import('../api/api.js');
 // 
 // /api/tactic/:tacticid -> retuns all the info about the tactic requested as fen,solution,explenation
 router.get('/api/tactic/id/:tacticid', Api.getTactic);
+// /api/tactic/addTactic -> adds a tactic to the database
+router.post('/api/tactic/addTactic', Api.addTactic); // TODO only for admins make a pipline for admins
 
 // /api/tactic/getCategories -> retuns all the categories of the tatics available
 router.get('/api/tactic/getCategories', Api.getCategories); 

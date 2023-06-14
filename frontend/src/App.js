@@ -1,10 +1,17 @@
-import TacticsPage from "./pages/TacticsPage/TacticsPage.jsx"
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import TacticsPage from "./pages/TacticsPage/TacticsPage.jsx";
+import AdminPage from "./pages/AdminPage/AdminPage.jsx";
 
 export default function App() {
   return (
     <>
-    <TacticsPage />
-    
+      <BrowserRouter basename="/">
+        <Routes>
+          <Route path="/tactics" element={<TacticsPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+        </Routes>
+      </BrowserRouter>
     </>
-  )
+  );
 }

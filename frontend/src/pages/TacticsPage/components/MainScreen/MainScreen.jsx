@@ -8,8 +8,7 @@ const initDataState = {
   titleCategory: "test",
   tacticInfo: "Simons - Lowe, London 1849",
   solution: "7...Qa5+ 0-1",
-  comments: "Black checks to capture the undefended bishop.",
-  isWhiteTurn: false,
+  comments: "Black checks to capture the undefended bishop."
 };
 
 export default function MainScreen({ className, tactic }) {
