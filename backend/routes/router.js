@@ -1,9 +1,12 @@
 import express from 'express';
+
 export const router = express.Router();
 
 const piplines = await import('./piplines.js');
 const Api = await import('../api/api.js');
 
+// User Routes
+router.post('/api/users/login', piplines.loginPipe);
 
 // routes
 // /admin
@@ -50,3 +53,4 @@ router.post('/api/:enginename/getEvaluation', Api.getEvaluation); // has to have
 
 // testing
 router.get('/api/test', Api.test);
+router.get('/api/testAccessAdmin', piplines.accessAdmin);

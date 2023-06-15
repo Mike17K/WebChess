@@ -8,7 +8,6 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
-
 const app = express();
 
 // Enable CORS for all routes
@@ -31,8 +30,8 @@ app.use(session({
 }
 ));
 app.use(flash());
-app.use(bodyParser.json());
-
+app.use(bodyParser.json()); 
+app.use(express.json()); 
 
 ///////////////////////////////////////////////////////////////////////////////////
 

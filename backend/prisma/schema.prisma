@@ -11,13 +11,15 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String?
-  password  String
+  id       String  @id @default(uuid())
+  email    String  @unique
+  name     String?
+  password String
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+  role      Role      @default(USER)
 
   score Int @default(0)
 
@@ -25,6 +27,11 @@ model User {
   friendOf User[] @relation("Friends")
 
   completedTactics Tactic[]
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 model Category {

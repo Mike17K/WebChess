@@ -1,0 +1,12 @@
+POST http://localhost:5050/api/users/login
+Content-type: application/json
+
+{
+    "email": "test@test",
+    "username" : "Mike",
+    "password" : "mike"
+}
+
+###
+GET http://localhost:5050/api/testAccessAdmin
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTWlrZSIsInVzZXJJZCI6IjEiLCJpYXQiOjE2ODY4MjQwMjN9.779YdkucahkYHgqIg30WvryTiCHETKl0_C3AidUq7Is

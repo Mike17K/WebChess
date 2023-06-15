@@ -17,6 +17,8 @@ export function validateObj(obj, fields = []) {
     }
 }
 
+// TODO board to fen
+
 export function fenToBoard(fen) {
     // This function converts a fen string to a board array
     const pieces = {p:"bP", n:"bN", b:"bB", r:"bR", q:"bQ", k:"bK", P:"wP", N:"wN", B:"wB", R:"wR", Q:"wQ", K:"wK"};
