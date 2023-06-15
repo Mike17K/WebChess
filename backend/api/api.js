@@ -14,6 +14,7 @@ export async function getLeagalMoves(req, res) {
     const enginename = "simpleEngine"
     const engineController = controllers[enginename];
     if(req.body.fen === undefined) return res.json({ errorMessage: "fen not provided" } );
+    // TODO check if fen is valid
     // get results
     const leagalMoves = await engineController.getLeagalMoves(req.body.fen);
     // send results
