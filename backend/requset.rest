@@ -10,3 +10,17 @@ Content-type: application/json
 ###
 GET http://localhost:5050/api/testAccessAdmin
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTWlrZSIsInVzZXJJZCI6IjEiLCJpYXQiOjE2ODY4MjQwMjN9.779YdkucahkYHgqIg30WvryTiCHETKl0_C3AidUq7Is
+
+###
+GET https://discord.com/api/oauth2/authorize?client_id=1119090598104797244&redirect_uri=http%3A%2F%2Flocalhost&response_type=code&scope=identify
+
+###
+GET https://discord.com/oauth2/authorize?response_type=code&client_id=1119090598104797244&scope=identify%20guilds.join&state=15773059ghq9183habn&redirect_uri=http%3A%2F%2Flocalhost&prompt=consent
+
+
+### 
+GET http://localhost:5050/api/users/login/discord
+
+###
+GET https://discord.com/api/v10/users/@me
+Authorization: Bearer XitPL1hBOvP8nFScOYNzqrVETpEHQ8

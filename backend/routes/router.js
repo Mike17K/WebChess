@@ -8,6 +8,10 @@ const Api = await import('../api/api.js');
 // User Routes
 router.post('/api/users/login', piplines.loginPipe);
 
+router.all('/api/users/auth/discord/redirect', piplines.discordRedirect);
+router.all('/api/users/auth/discord/logout', piplines.discordLogout);
+
+
 // routes
 // /admin
 // router.get('/admin', piplines.adminPipe);??????????

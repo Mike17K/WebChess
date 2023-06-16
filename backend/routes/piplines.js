@@ -84,6 +84,59 @@ export function logout(req, res) {
     res.sendStatus(204);
 }
 
+const DISCORD_ENDPOINT = 'https://discord.com/api/v10';
+export async function discordRedirect(req, res) {
+    // got the code in req.query.code
+    const code = req.query.code;
+
+    // we need to exchange it with an access token
+    const body = `client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=http://localhost:5050/api/users/auth/discord/redirect`;
+    const response = await fetch(`${DISCORD_ENDPOINT}/oauth2/token`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body
+    }).catch(err => {
+        console.log(err);
+        res.sendStatus(400);
+    });
+    
+    const tokenResponse = await response.json();
+    res.redirect(`http://localhost:3000/login?access_token=${tokenResponse.access_token}&&refresh_token=${tokenResponse.refresh_token}`)
+  }
+
+  export async function discordLogout(req, res) {
+    const token = req.headers['token'];
+    console.log(token);
+  
+    fetch(`${DISCORD_ENDPOINT}/oauth2/token/revoke`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        client_id: process.env.DISCORD_CLIENT_ID,
+        client_secret: process.env.DISCORD_CLIENT_SECRET,
+        token: token,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        if (Object.keys(data).length === 0) {
+          res.sendStatus(200);
+        } else {
+          res.sendStatus(400);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.sendStatus(405);
+      });
+  }
+  
+
 // TODO if the jwt working remote the session
 // TODO fix the login proses
 export const accessAdmin = [authToken /*, authRole(Role.ADMIN)*/ ,(req, res) => {

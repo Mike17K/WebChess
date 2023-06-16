@@ -1,0 +1,17 @@
+.discord-button{
+    background-color: #5865F2;
+    width: 212px;
+    height: 44px;
+
+
+    display: flex;
+
+    align-items: center;
+
+    transition: all 0.1s;
+}
+
+.discord-button:hover{
+    cursor: pointer;
+    background-color: #5865f2ce;
+}

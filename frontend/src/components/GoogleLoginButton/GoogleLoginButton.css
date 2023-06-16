@@ -1,0 +1,23 @@
+.logout-button{
+    background-color: #1a73e8;
+    width: 212px;
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+    line-height: 16px;
+
+    transition: all 0.1s;
+}
+
+.logout-button:hover{
+    cursor: pointer;
+    background-color: #1a73e8ce;
+}
+
+.logout-button img{
+    height: 22px;
+    border-radius: 50%;
+    margin: 10px;
+}
