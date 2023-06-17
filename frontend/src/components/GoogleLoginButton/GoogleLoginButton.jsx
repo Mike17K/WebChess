@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import jwt_decode from "jwt-decode";
 import credentials from "../../credentials.json"
 import './GoogleLoginButton.css';
 
-export default function GoogleLoginButton({setJwt,setUserData}) {
-    const [user,setUser] = useState({});
+export default function GoogleLoginButton({setJwt,userData,setUserData}) {
 
     function handleSignOut(event) {
         event.preventDefault()
         google.accounts.id.disableAutoSelect()
         google.accounts.id.revoke(localStorage.getItem("googleToken"), handleSignOutCallback)
-        setUser({});
     }
     function handleSignOutCallback() {
         setJwt("");
         setUserData({});
-        setUser({});
+        localStorage.removeItem('session');
     }
     
 
@@ -25,13 +23,31 @@ export default function GoogleLoginButton({setJwt,setUserData}) {
             setJwt(response.credential)
             const decoded = jwt_decode(response.credential)
             setUserData(decoded)
-            setUser(decoded)
+            localStorage.removeItem('session');
+            localStorage.setItem('session', JSON.stringify({...decoded,access_token:response.credential,provider:"Google"}));
             // this is the user object
             // console.log(decoded);
         }
     }
 
     useEffect(() => {
+        // if user is logged in
+        if(userData.provider !== undefined){
+            if(userData.provider === "Google") return;
+        }
+        
+        if(localStorage.getItem('session') !== null){
+            const session = JSON.parse(localStorage.getItem('session'));
+            if(session.provider !== "Google") return;
+            setJwt(session.access_token);
+            setUserData(session);
+            return;
+        }
+    }, [userData,setJwt,setUserData])
+
+
+    useEffect(() => {
+        
         if(credentials.GOOGLE_CLIENT_ID === undefined) {
             console.error("Google Client ID is undefined in the /src/credentials.json file")
             return
@@ -58,20 +74,20 @@ export default function GoogleLoginButton({setJwt,setUserData}) {
 
         //google.accounts.id.prompt();
     /* eslint-disable react-hooks/exhaustive-deps */
-    }, [user])
+    }, [userData])
 
   return (
     <>
         {
-        user.name !== undefined && (
+        userData.provider === "Google" && (
             <div onClick={handleSignOut}
             className='logout-button rounded relative'
             >
-                <img src={`${user.picture}`} alt="profile img" />
+                <img src={`${userData.picture}`} alt="profile img" />
                 <div className='flex text-white '>
                     <div className='flex flex-col text-white'>
                 <span className=" text-[14px] font-bold">Αποσύνδεση</span>
-                <span className=" text-[12px]">{user.email}</span>
+                <span className=" text-[12px]">{userData.email}</span>
                     </div>
                 </div>
 
@@ -83,7 +99,7 @@ export default function GoogleLoginButton({setJwt,setUserData}) {
             )
         }
         {
-        user.name === undefined  && (
+        userData.provider !== "Google"  && (
             <div id="google_login_button"></div>
             )
         }

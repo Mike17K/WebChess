@@ -10,12 +10,15 @@ export default function LoginPage(props) {
   return (
     <>
     <div>LoginPage</div>
-    <GoogleLoginButton setJwt={setJwt} setUserData={setUserData}/>
-    <DiscordLoginButton setJwt={setJwt} setUserData={setUserData}/>
+    <GoogleLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>
+    <DiscordLoginButton setJwt={setJwt}userData={userData} setUserData={setUserData}/>
+    
     <br />
     {JSON.stringify(userData)}
     <br />
     {jwt}
+    <br />
+    {localStorage.getItem('session')}
     </>
   )
 }

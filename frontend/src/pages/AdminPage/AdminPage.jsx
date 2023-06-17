@@ -2,6 +2,27 @@ import React, { useEffect, useRef, useState } from 'react'
 import ChessBoard from '../../components/ChessBoard/ChessBoard';
 
 export default function AdminPage() {
+        // the server will refuse access if not admin
+        const [accessKey,setAccessKey] = useState(null);
+
+        // TODO if user is not logged in redirect to login page
+        const user = {
+                jwt: "OrJo43ci6sAjFErJGSxqrFzjMVYtgX" //TODO this from login process
+        };
+        // TODO if user is logged fetch the access key from the server
+        useEffect(() =>{
+        fetch('http://localhost:5050/api/admin/getAccessKey',{ //TODO implenment from sever this endpoint
+        method: 'GET',
+        headers: {
+                "admin_jwt":user.jwt
+        }
+        }).then(response => response.json()).then(data=>{
+                setAccessKey(data.accessKey)
+        }).catch(error => {console.error(error);});
+
+        },[user.jwt]);
+
+
         // get categories
         const [categories, setCategories] = useState([]);
         const [fen,setFen] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -21,10 +42,14 @@ export default function AdminPage() {
   return (
     <>
         <div>AdminPage</div>
+        {
+        accessKey!==null && (
+                <>                        
         <br />
         <h1>Add a tactic</h1>
 
         <form action="http://localhost:5050/api/tactic/addTactic" method="post" className='border'>
+        <input type="text" name="access_key" value={accessKey} disabled/>
         <table >
             <tbody>
                 <tr>
@@ -37,7 +62,7 @@ export default function AdminPage() {
                                 categories.map((category, index) => {
                                         return (
                                                 <option key={index} value={category.name}>{category.name}</option>
-                                        )
+                                                )
                                         }
                                 )
                         }
@@ -101,6 +126,9 @@ export default function AdminPage() {
         <div className="w-[70%] mx-auto">
         <ChessBoard fen={fen} whiteSide={true} />
         </div>
+        </>
+    )
+}
     </>
   )
 }

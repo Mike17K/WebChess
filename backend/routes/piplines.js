@@ -74,6 +74,7 @@ function authToken(req, res, next) {// Validates if the token is not corrupted
             console.log(err);
             return res.sendStatus(403);
         }
+        console.log(token)
         req.user = user;
         next();
     })

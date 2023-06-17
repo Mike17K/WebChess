@@ -56,9 +56,12 @@ export async function getTactic(req, res) {
 // /api/tactic/addTactic -> adds a tactic to the database
 export async function addTactic(req, res) {
     // validate inputs
-    if (!validateObj(req.body, ["title","titleCategory","fen","hints","tacticInfo","solution","comments"])) return res.json({ errorMessage: 'Not all fields provided: ["title","titleCategory","fen","hints","tacticInfo","solution","comments"]'});
+    if (!validateObj(req.body, ["access_key","title","titleCategory","fen","hints","tacticInfo","solution","comments"])) return res.json({ errorMessage: 'Not all fields provided: ["title","titleCategory","fen","hints","tacticInfo","solution","comments"]'});
     // get data 
-    const { title,titleCategory,fen,hints,tacticInfo,solution,comments } = req.body;
+    const { access_key,title,titleCategory,fen,hints,tacticInfo,solution,comments } = req.body;
+    // TODO check if access key is valid for accessing the admin panel
+    // access_key if not valid redirect return 400 
+
     // submit data
     const tactic = await prisma.tactic.create({
         data: {

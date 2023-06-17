@@ -5,8 +5,7 @@ import queryString from 'query-string';
 
 import './DiscordLoginButton.css';
 
-export default function DiscordLoginButton({setJwt,setUserData}) {
-    const [user,setUser] = useState({});
+export default function DiscordLoginButton({setJwt,userData,setUserData}) {
     const [accessToken,setAccessToken] = useState("");
 
     const DISCORD_ENDPOINT = 'https://discord.com/api/v10';
@@ -14,10 +13,16 @@ export default function DiscordLoginButton({setJwt,setUserData}) {
     
     const location = useLocation();
     const queryParams = queryString.parse(location.search);
-
+    
     useEffect(()=>{
-        if(Object.keys(user).length !== 0) return ;
-    fetch(`${DISCORD_ENDPOINT}/users/@me`, {
+        const session = JSON.parse(localStorage.getItem('session'));
+        if(session !== null){
+            if(session.provider !== "Discord" || queryParams.access_token === undefined) return;
+        }
+
+        if(Object.keys(userData).length !== 0) return ;
+        console.log("Fetching user data Discord",userData)
+        fetch(`${DISCORD_ENDPOINT}/users/@me`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${queryParams.access_token}`
@@ -27,12 +32,13 @@ export default function DiscordLoginButton({setJwt,setUserData}) {
         setUserData(data)
         setJwt(queryParams.access_token)
         setAccessToken(queryParams.access_token)
-        setUser(data)
+        localStorage.removeItem('session');
+        localStorage.setItem('session', JSON.stringify({...data,access_token:queryParams.access_token,provider:"Discord"}));
       }).catch(err => {
         console.log(err);
     });
-    
-    },[user])
+    /* eslint-disable react-hooks/exhaustive-deps */
+    },[userData])
 
        // for discord logout 
     function logout(e){       
@@ -43,18 +49,19 @@ export default function DiscordLoginButton({setJwt,setUserData}) {
             }
         }).then(response=> {
             if(response.status !== 200) return;
-            setUser({});
             setJwt("");
             setUserData({});
+            localStorage.removeItem('session');
+            
         }).catch(err => {
             console.log(err);
-        });
+        }); 
     }
     
   return (
       <>
         {
-            user.id === undefined && (
+            userData.id === undefined && (
         <button id="info" 
         className='discord-button rounded'
         onClick={(e)=>{window.location.href=DISCORD_IDENTIFY_URL}} >
@@ -79,16 +86,16 @@ export default function DiscordLoginButton({setJwt,setUserData}) {
             )
         }
         {
-            user.id !== undefined && (
+            userData.id !== undefined && (
         <button id="info" 
         className='discord-button rounded relative'
         onClick={logout} >
         
-        <img className="w-[22px] h-[22px] rounded-full ml-[10px]" src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`} alt="Discord Avatar" />
+        <img className="w-[22px] h-[22px] rounded-full ml-[10px]" src={`https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`} alt="Discord Avatar" />
 
         <div className='block text-sm my-auto px-2 leading-[15px]'>
             <div className='block text-white text-[14px] font-bold text-start '>Log out</div>
-            <div className='block text-white text-[12px] text-start'>{user.username}#{user.discriminator}</div>
+            <div className='block text-white text-[12px] text-start'>{userData.username}#{userData.discriminator}</div>
             
         </div>
         
