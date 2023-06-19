@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import credentials from "../../credentials.json"
+
 import { useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 
@@ -9,7 +11,7 @@ export default function DiscordLoginButton({setJwt,userData,setUserData}) {
     const [accessToken,setAccessToken] = useState("");
 
     const DISCORD_ENDPOINT = 'https://discord.com/api/v10';
-    const DISCORD_IDENTIFY_URL = 'https://discord.com/api/oauth2/authorize?client_id=1119090598104797244&redirect_uri=http%3A%2F%2Flocalhost%3A5050%2Fapi%2Fusers%2Fauth%2Fdiscord%2Fredirect&response_type=code&scope=identify'
+    const DISCORD_IDENTIFY_URL = `https://discord.com/api/oauth2/authorize?client_id=${credentials.DISCORD_CLIENT_ID}&redirect_uri=http%3A%2F%2Flocalhost%3A5050%2Fapi%2Fusers%2Fauth%2Fdiscord%2Fredirect&response_type=code&scope=identify`;
     
     const location = useLocation();
     const queryParams = queryString.parse(location.search);
@@ -19,9 +21,11 @@ export default function DiscordLoginButton({setJwt,userData,setUserData}) {
         if(session !== null){
             if(session.provider === "Discord" && queryParams.access_token === undefined) {
                 setUserData(session);
+                setJwt(session.access_token);
                 return;
             }
         }
+        /* eslint-disable react-hooks/exhaustive-deps */
     },[]);
 
     useEffect(()=>{
@@ -73,7 +77,7 @@ export default function DiscordLoginButton({setJwt,userData,setUserData}) {
   return (
       <>
         {
-            userData.id === undefined && (
+            userData.provider !== "Discord" && (
         <button id="info" 
         className='discord-button rounded'
         onClick={(e)=> window.location.href = DISCORD_IDENTIFY_URL } >
@@ -98,7 +102,7 @@ export default function DiscordLoginButton({setJwt,userData,setUserData}) {
             )
         }
         {
-            userData.id !== undefined && (
+            userData.provider === "Discord" && (
         <button id="info" 
         className='discord-button rounded relative'
         onClick={logout} >

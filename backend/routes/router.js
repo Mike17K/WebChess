@@ -15,7 +15,9 @@ router.use('/api/tactic', routerTactics);
 // User Routes after: /api/users
 routerAuth.post('/login', piplines.loginPipe);
 routerAuth.all('/auth/discord/redirect', piplines.discordRedirect);
+routerAuth.get('/auth/github/redirect', piplines.githubRedirect);
 routerAuth.all('/auth/discord/logout', piplines.discordLogout);
+routerAuth.all('/auth/github/logout', piplines.githubLogout);
 
 
 // routes

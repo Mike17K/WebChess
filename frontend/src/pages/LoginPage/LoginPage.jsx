@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import GoogleLoginButton from "../../components/GoogleLoginButton/GoogleLoginButton"
 import DiscordLoginButton from "../../components/DiscordLoginButton/DiscordLoginButton"
+import GithubLoginButton from "../../components/GithubLoginButton/GithubLoginButton"
 
 
 export default function LoginPage(props) {
@@ -12,13 +13,15 @@ export default function LoginPage(props) {
     <div>LoginPage</div>
     <GoogleLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>
     <DiscordLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>
+    <GithubLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>
     
     <br />
     {JSON.stringify(userData)}
     <br />
-    {jwt}
+    ok
     <br />
-    {localStorage.getItem('session')}
+    {jwt}
+
     </>
   )
 }

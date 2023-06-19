@@ -1,0 +1,17 @@
+.github-button{
+    background-color: #000000;
+    width: 212px;
+    height: 44px;
+
+
+    display: flex;
+
+    align-items: center;
+
+    transition: all 0.1s;
+}
+
+.github-button:hover{
+    cursor: pointer;
+    background-color: #000000b6;
+}

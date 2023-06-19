@@ -3,10 +3,10 @@ import jwt_decode from "jwt-decode";
 import credentials from "../../credentials.json"
 import './GoogleLoginButton.css';
 
+/* global google */
 export default function GoogleLoginButton({setJwt,userData,setUserData}) {
 
     function handleSignOut(event) {
-        /* global google */
         event.preventDefault()
         google.accounts.id.disableAutoSelect()
         google.accounts.id.revoke(localStorage.getItem("googleToken"), handleSignOutCallback)
@@ -44,6 +44,7 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
             setUserData(session);
             return;
         }
+        /* eslint-disable react-hooks/exhaustive-deps */
     }, [userData,setJwt,setUserData])
 
 
@@ -54,14 +55,12 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
             return
         }
 
-        /* global google */
         google.accounts.id.initialize({
             client_id: credentials.GOOGLE_CLIENT_ID,
             callback: handleCallbackResponse,
             auto_select: true,
             cancel_on_tap_outside: false
         })
-        /* global google */
         google.accounts.id.renderButton(
             document.getElementById("google_login_button"),
             {

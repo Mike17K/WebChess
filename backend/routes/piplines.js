@@ -136,7 +136,53 @@ export async function discordRedirect(req, res) {
         res.sendStatus(405);
       });
   }
+
+  export async function githubRedirect(req,res){
+     // The req.query object has the query params that were sent to this route.
+    const requestToken = req.query.code
+
+    fetch(`https://github.com/login/oauth/access_token?client_id=${process.env.GITHUB_CLIENT_ID}&client_secret=${process.env.GITHUB_CLIENT_SECRET}&code=${requestToken}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      const access_token = data.access_token;
+      res.redirect(`http://localhost:3000/login?github_access_token=${access_token}`)
+    })
+    .catch(error => {
+      console.error(error);
+    });
+
+  }
   
+  export async function githubLogout(req, res) {
+    const token = req.headers['token'];
+
+    fetch(`https://api.github.com/applications/${process.env.GITHUB_CLIENT_ID}/token`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'X-GitHub-Api-Version': '2022-11-28'
+    }
+ })
+    .then(response => {
+    if (response.status === 204) {
+        console.log('Access token revoked successfully.');
+        res.sendStatus(200);
+    } else {
+        console.error('Failed to revoke access token.');
+    }
+    })
+    .catch(error => {
+    console.error('Error occurred during access token revocation:', error);
+    });
+
+
+  }
 
 // TODO if the jwt working remote the session
 // TODO fix the login proses
