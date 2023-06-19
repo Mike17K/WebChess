@@ -1,6 +1,6 @@
 # A FULL STACK APP FOR CHESS
 
-Using Prisma,mySQL,Express,React i am building this project about organizing chess tactics and solving them baced of the data of a book.
+Using Prisma,mySQL,Express,React,Redux,tailwind i am building this project about organizing chess tactics and solving them baced of the data of a book.
 
 # Views
 

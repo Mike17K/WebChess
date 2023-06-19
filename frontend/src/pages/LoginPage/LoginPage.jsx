@@ -18,8 +18,6 @@ export default function LoginPage(props) {
     <br />
     {JSON.stringify(userData)}
     <br />
-    ok
-    <br />
     {jwt}
 
     </>
