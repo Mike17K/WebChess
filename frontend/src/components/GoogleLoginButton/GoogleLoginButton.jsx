@@ -6,6 +6,7 @@ import './GoogleLoginButton.css';
 export default function GoogleLoginButton({setJwt,userData,setUserData}) {
 
     function handleSignOut(event) {
+        /* global google */
         event.preventDefault()
         google.accounts.id.disableAutoSelect()
         google.accounts.id.revoke(localStorage.getItem("googleToken"), handleSignOutCallback)
@@ -60,7 +61,7 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
             auto_select: true,
             cancel_on_tap_outside: false
         })
-
+        /* global google */
         google.accounts.id.renderButton(
             document.getElementById("google_login_button"),
             {

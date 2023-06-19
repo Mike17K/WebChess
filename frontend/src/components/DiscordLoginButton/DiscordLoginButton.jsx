@@ -17,7 +17,17 @@ export default function DiscordLoginButton({setJwt,userData,setUserData}) {
     useEffect(()=>{
         const session = JSON.parse(localStorage.getItem('session'));
         if(session !== null){
-            if(session.provider !== "Discord" || queryParams.access_token === undefined) return;
+            if(session.provider === "Discord" && queryParams.access_token === undefined) {
+                setUserData(session);
+                return;
+            }
+        }
+    },[]);
+
+    useEffect(()=>{
+        const session = JSON.parse(localStorage.getItem('session'));
+        if(session !== null){
+            if(queryParams.access_token === undefined) return;
         }
 
         if(Object.keys(userData).length !== 0) return ;
@@ -34,12 +44,14 @@ export default function DiscordLoginButton({setJwt,userData,setUserData}) {
         setAccessToken(queryParams.access_token)
         localStorage.removeItem('session');
         localStorage.setItem('session', JSON.stringify({...data,access_token:queryParams.access_token,provider:"Discord"}));
+        window.location.href = 'http://localhost:3000/login';
       }).catch(err => {
         console.log(err);
     });
     /* eslint-disable react-hooks/exhaustive-deps */
+    
     },[userData])
-
+    
        // for discord logout 
     function logout(e){       
         fetch(`http://localhost:5050/api/users/auth/discord/logout`, {
@@ -57,14 +69,14 @@ export default function DiscordLoginButton({setJwt,userData,setUserData}) {
             console.log(err);
         }); 
     }
-    
+
   return (
       <>
         {
             userData.id === undefined && (
         <button id="info" 
         className='discord-button rounded'
-        onClick={(e)=>{window.location.href=DISCORD_IDENTIFY_URL}} >
+        onClick={(e)=> window.location.href = DISCORD_IDENTIFY_URL } >
         <div className='mx-auto flex'>
         
         <svg xmlns="http://www.w3.org/2000/svg" fill="white" width="25" height="25" viewBox="0 0 127.14 96.36">

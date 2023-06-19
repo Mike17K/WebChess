@@ -1,15 +1,21 @@
 import express from 'express';
 
-export const router = express.Router();
+export const router = express.Router(); // main router
+const routerAuth = express.Router(); // all routes about authentication
+const routerTactics = express.Router(); // all routes about tactics page
 
 const piplines = await import('./piplines.js');
 const Api = await import('../api/api.js');
 
-// User Routes
-router.post('/api/users/login', piplines.loginPipe);
+// main api route
+router.use('/api/users', routerAuth);
+router.use('/api/tactic', routerTactics);
 
-router.all('/api/users/auth/discord/redirect', piplines.discordRedirect);
-router.all('/api/users/auth/discord/logout', piplines.discordLogout);
+// auth routes
+// User Routes after: /api/users
+routerAuth.post('/login', piplines.loginPipe);
+routerAuth.all('/auth/discord/redirect', piplines.discordRedirect);
+routerAuth.all('/auth/discord/logout', piplines.discordLogout);
 
 
 // routes
@@ -29,13 +35,11 @@ router.all('/api/users/auth/discord/logout', piplines.discordLogout);
 // /api/user/:userid -> returns the information about a user
 // 
 // /api/tactic/:tacticid -> retuns all the info about the tactic requested as fen,solution,explenation
-router.get('/api/tactic/id/:tacticid', Api.getTactic);
-// /api/tactic/addTactic -> adds a tactic to the database
-router.post('/api/tactic/addTactic', Api.addTactic); // TODO only for admins make a pipline for admins
+routerTactics.get('/id/:tacticid', Api.getTactic);
+routerTactics.post('/addTactic', Api.addTactic); // /api/tactic/addTactic -> adds a tactic to the database // TODO only for admins make a pipline for admins // TODO change it to get req with data on headers
 
-// /api/tactic/getCategories -> retuns all the categories of the tatics available
-router.get('/api/tactic/getCategories', Api.getCategories); 
-router.post('/api/tactic/getCategoryTactics', Api.getCategoryTactics); // has to contain a body with a titleCategory field
+routerTactics.get('/getCategories', Api.getCategories); // /api/tactic/getCategories -> retuns all the categories of the tatics available
+routerTactics.post('/getCategoryTactics', Api.getCategoryTactics); // has to contain a body with a titleCategory field // TODO change it to get req with data on headers
 
 
 

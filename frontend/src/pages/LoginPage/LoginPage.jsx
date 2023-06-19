@@ -11,7 +11,7 @@ export default function LoginPage(props) {
     <>
     <div>LoginPage</div>
     <GoogleLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>
-    <DiscordLoginButton setJwt={setJwt}userData={userData} setUserData={setUserData}/>
+    <DiscordLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>
     
     <br />
     {JSON.stringify(userData)}
