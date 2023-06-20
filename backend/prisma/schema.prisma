@@ -16,6 +16,10 @@ model User {
   name     String?
   password String
 
+  aud     String @default(uuid())
+  authProvider String?
+  picture String?
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -27,6 +31,17 @@ model User {
   friendOf User[] @relation("Friends")
 
   completedTactics Tactic[]
+  accessTokens Token[]
+}
+
+model Token{
+  id String  @id @default(uuid())
+  token String
+  created DateTime  @default(now())
+  expired DateTime
+
+  userid String
+  belongsTo User @relation(fields: [userid], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 enum Role {

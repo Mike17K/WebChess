@@ -25,38 +25,38 @@ export default function LoginPage(props) {
   return (
     <>
     <div>LoginPage</div>
-    <form onSubmit={onSubmitHandle}
-    className='flex flex-col w-[50%]'
-    >
-      <table>
-        <tr>
-          <th>
-      <label htmlFor="name">User Name</label>
-          </th>
-          <th>
-      <input type="text" name='name' placeholder='Username'/>
-          </th>
-        </tr>
-        <tr>
-          <th>
-      <label htmlFor="password">Password</label>
-          </th>
-          <th>
-      <input type="password" name='password' placeholder='Password'/>
-          </th>
-        </tr>
-        <tr>
-          <th>
-      <label htmlFor="validate_password">Validate Password</label>
-          </th>
-          <th>
-      <input type="password" name='validate_password' placeholder='Password'/>
-          </th>
-        </tr>
-      </table>
-      <button type="submit">Sing In</button>
-      
-    </form>
+    <form onSubmit={onSubmitHandle} className="flex flex-col w-[50%]">
+  <table>
+    <tbody>
+      <tr>
+        <td>
+          <label htmlFor="name">User Name</label>
+        </td>
+        <td>
+          <input type="text" name="name" placeholder="Username" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label htmlFor="password">Password</label>
+        </td>
+        <td>
+          <input type="password" name="password" placeholder="Password" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label htmlFor="validate_password">Validate Password</label>
+        </td>
+        <td>
+          <input type="password" name="validate_password" placeholder="Password" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <button type="submit">Sign In</button>
+</form>
+
 
     <GoogleLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>
     <DiscordLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>

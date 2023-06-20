@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import jwt_decode from "jwt-decode";
 import credentials from "../../credentials.json"
 //import google from 'google';
 import './GoogleLoginButton.css';
@@ -10,43 +9,87 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
     function handleSignOut(event) {
         event.preventDefault()
         google.accounts.id.disableAutoSelect()
-        google.accounts.id.revoke(localStorage.getItem("googleToken"), handleSignOutCallback)
-    }
-    function handleSignOutCallback() {
-        setJwt("");
-        setUserData({});
-        localStorage.removeItem('session');
+        google.accounts.id.revoke(localStorage.getItem("googleToken"),()=>{
+
+            const session = JSON.parse(localStorage.getItem('session'));
+            // revoke the access tocken from server
+            fetch('http://localhost:5050/api/users/token',{
+                method:"DELETE",
+                headers: {
+                    'token': session.access_server_key,
+                    'userid': session.profile.id
+                }}).then(response =>{
+                    if(!response.ok){
+                        console.log("Something went wrong");
+                        return;
+                    } 
+                    
+                    console.log("Logged Out");
+                    setJwt("");
+                    setUserData({});
+                    localStorage.removeItem('session');
+                });
+                
+            })
+    }    
+
+    async function getServerAccessTocken(response) {
+        fetch('http://localhost:5050/api/users/token',{
+            method:"GET",
+            headers: {
+                'token': response.credential,
+                "provider":"Google"
+            }
+            }).then(data => data.json()).then(data =>{
+                // get access key from server
+                const {access_server_key,ttl,userId} = data;
+                console.log(access_server_key,ttl);
+                // store it localy
+                const session = JSON.parse(localStorage.getItem('session'));
+                // update the session with the access_server_key, provider
+                localStorage.setItem('session', JSON.stringify({...session,access_server_key:access_server_key,provider:"Google"}));
+                fetchMyProfile(access_server_key,userId);
+                })
+            };
+
+    async function fetchMyProfile(access_server_key,userId){
+        // fetching users profile
+        fetch(`http://localhost:5050/api/users/profile/${userId}/me`,{
+            method:"GET",
+            headers: {
+                'access_server_key': access_server_key,
+            }
+        }).then(data => data.json()).then(profile =>{
+            // got the profile data from server
+            console.log(profile);
+            const session = JSON.parse(localStorage.getItem('session'));
+            // update the session data with the profile data
+            localStorage.setItem('session', JSON.stringify({...session,profile:profile}));
+        
+            setUserData(profile);
+            setJwt(session.access_server_key);
+            
+        }).catch(err=> {
+            console.log(err)
+            // if the profile cant be accessed remove it from session
+            const session = JSON.parse(localStorage.getItem('session'));
+            localStorage.setItem('session', JSON.stringify({...session,profile:{},access_server_key:undefined,provider:undefined}));
+        });
     }
     
-
-    function handleCallbackResponse(response) {
-        console.log(response);
-        if (response.credential) {
-            setJwt(response.credential)
-            const decoded = jwt_decode(response.credential)
-            setUserData(decoded)
-            localStorage.removeItem('session');
-            localStorage.setItem('session', JSON.stringify({...decoded,access_token:response.credential,provider:"Google"}));
-            // this is the user object
-            // console.log(decoded);
-        }
-    }
-
     useEffect(() => {
-        // if user is logged in
-        if(userData.provider !== undefined){
-            if(userData.provider === "Google") return;
-        }
-        
-        if(localStorage.getItem('session') !== null){
-            const session = JSON.parse(localStorage.getItem('session'));
-            if(session.provider !== "Google") return;
-            setJwt(session.access_token);
-            setUserData(session);
-            return;
+        // if there is session data from google set them as profile data
+        const session = JSON.parse(localStorage.getItem('session'));
+        if(session!== null){
+            if(session.provider !== undefined){
+                if(session.provider === "Google") {
+                    fetchMyProfile(session.access_server_key,session.profile.userId)
+                    return;
+                }
+            }
         }
         /* eslint-disable react-hooks/exhaustive-deps */
-    }, [userData,setJwt,setUserData])
+    }, [])
 
 
     useEffect(() => {
@@ -58,7 +101,7 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
 
         google.accounts.id.initialize({
             client_id: credentials.GOOGLE_CLIENT_ID,
-            callback: handleCallbackResponse,
+            callback: getServerAccessTocken,
             auto_select: true,
             cancel_on_tap_outside: false
         })
@@ -80,7 +123,7 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
   return (
     <>
         {
-        userData.provider === "Google" && (
+        userData.authProvider === "Google" && (
             <div onClick={handleSignOut}
             className='logout-button rounded relative'
             >
@@ -100,7 +143,7 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
             )
         }
         {
-        userData.provider !== "Google"  && (
+        userData.authProvider !== "Google"  && (
             <div id="google_login_button"></div>
             )
         }

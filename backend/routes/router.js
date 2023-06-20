@@ -1,33 +1,19 @@
 import express from 'express';
 
+import {routerUsers} from './usersRouter/usersRouter.js';
+
 export const router = express.Router(); // main router
-const routerAuth = express.Router(); // all routes about authentication
 const routerTactics = express.Router(); // all routes about tactics page
 
 const piplines = await import('./piplines.js');
 const Api = await import('../api/api.js');
 
 // main api route
-router.use('/api/users', routerAuth);
+router.use('/api/users', routerUsers);
+
 router.use('/api/tactic', routerTactics);
 
-// auth routes
-// User Routes after: /api/users
-routerAuth.post('/login', piplines.loginPipe);
-routerAuth.all('/auth/discord/redirect', piplines.discordRedirect);
-routerAuth.get('/auth/github/redirect', piplines.githubRedirect);
-routerAuth.all('/auth/discord/logout', piplines.discordLogout);
-routerAuth.all('/auth/github/logout', piplines.githubLogout);
 
-
-// routes
-// /admin
-// router.get('/admin', piplines.adminPipe);??????????
-
-// /api/addUser
-// /api/delUser
-// /api/updateUser
-// 
 // {logged in}
 // /api/game/newGame -> returns secret code that is stored from client and when he calls /api/newGame/addMove sends this key for knowing in what game you are refering to
 // /api/game/addMove
