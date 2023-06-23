@@ -8,25 +8,27 @@ const usersApi = await import('../../api/usersApi.js');
 //      getMyProfilePipe      //
 ////////////////////////////////
 
-async function validateAccessKey(userId,token,callback){
+async function validateAccessKey(profileId,token,callback){
+    if(!profileId) return;
+    
     // check if there is this token in the userId
-    const isValid = await usersApi.profileTokenValidation({userId:userId,token:token});
+    const isValid = await usersApi.profileTokenValidation({profileId:profileId,token:token});
 
     if(!isValid) return;  // tell the client that there is a server error with the accesskey
     callback();
 }
 
 async function sendProfile(req,res){
-    const userId = req.body.userId;
+    const profileId = req.params.profileId;
 
     // get user data
-    const userProfile = await usersApi.getProfile({userId:userId,userMode:"OWNER"});
-
+    const userProfile = await usersApi.getProfile({profileId:profileId,userMode:"OWNER"});
+    
     // send user data
     res.json(userProfile);
 }
 
-export const getMyProfilePipe = [(req,res,next)=>validateAccessKey(req.body.userId,req.headers['access_server_key'],next),sendProfile];
+export const getMyProfilePipe = [(req,res,next)=>validateAccessKey(req.params.profileId,req.headers['access_server_key'],next),sendProfile];
 
 
 ////////////////////////////////
@@ -53,17 +55,17 @@ async function checkTokenWithProvider(req,res,next){
     const provider = req.headers['provider'];
     
     if(provider === "Google"){
-        const token = req.headers['token'];
+        const code = req.headers['code'];
         
-        const decoded = jwt_decode(token);
-        const {email,aud,iss} = decoded;
+        const decoded_data = jwt_decode(code);
+        const {email,aud,iss} = decoded_data;
         
         if(iss !== 'https://accounts.google.com') return res.sendStatus(400); // validate iss
         
         // serch in database for account with this email and id of aud
         const user = await usersApi.findUser({where: {AND: [{ email: email },{ aud:aud },],},});
         
-        if(!user) return res.sendStatus(400);
+        if(!user) return res.sendStatus(500);
         
         req.userId = user.id;
 
@@ -79,8 +81,28 @@ async function checkTokenWithProvider(req,res,next){
         next();
         return
     }else if(provider === "Github"){
-        // const token = req.headers['token']; // this will probably be the code
-        // TODO
+        const code = req.headers['code'];
+        // validating the code
+        const responce = await fetch(`https://api.github.com/user`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `token ${code}`
+            }
+          }).then(responce=>responce.json()).catch(err=>console.log(err));
+
+          if(responce.message === 'Bad credentials'){
+            return res.sendStatus(500)
+          }
+
+        const {name,node_id} = responce;
+        
+        // serch in database for account with this email and id of aud
+        const user = await usersApi.findUser({where: {AND: [{ name: name },{ aud:node_id },],},});
+        
+        if(!user) return res.sendStatus(500);
+        
+        req.userId = user.id;
+        
         next();
         return
     }
@@ -94,6 +116,7 @@ async function generateToken(req,res){
     const status = await usersApi.setToken(userId,access_server_key,ttl);
 
     if(status){
+        console.log({access_server_key:access_server_key,ttl:ttl,userId:userId});
         res.json({access_server_key:access_server_key,ttl:ttl,userId:userId});
         return;
     }

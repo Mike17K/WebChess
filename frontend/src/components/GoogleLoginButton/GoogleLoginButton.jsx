@@ -3,57 +3,53 @@ import credentials from "../../credentials.json"
 //import google from 'google';
 import './GoogleLoginButton.css';
 
+
+// General functions for all sign in processes
+
+function revokeServerToken(callback) {
+    const session = JSON.parse(localStorage.getItem('session'));
+    if(session === null) return;
+    if(session.provider === undefined) return;
+    if(session.profile === undefined) return;
+    if(session.access_server_key === undefined) return;
+    if(session.profile.id === undefined) return;
+
+    // revoke the access tocken from server
+    fetch('http://localhost:5050/api/users/token',{
+        method:"DELETE",
+        headers: {
+            'token': session.access_server_key,
+            'userid': session.profile.id
+        }}).then(response =>{
+            if(!response.ok){
+                console.log("Something went wrong");
+                return;
+            } 
+            callback();
+            localStorage.removeItem('session');
+        });
+
+}
+
+function getServerAccessTocken(code,provider,callback=(data)=>{}) {
+    fetch('http://localhost:5050/api/users/token',{
+        method:"GET",
+        headers: {
+            'code': code,
+            "provider":provider
+        }
+        }).then(data => data.json()).then(data =>{
+            // get access key from server
+            callback(data);
+            })
+}
+
+
 /* global google */
 export default function GoogleLoginButton({setJwt,userData,setUserData}) {
-
-    function handleSignOut(event) {
-        event.preventDefault()
-        google.accounts.id.disableAutoSelect()
-        google.accounts.id.revoke(localStorage.getItem("googleToken"),()=>{
-
-            const session = JSON.parse(localStorage.getItem('session'));
-            // revoke the access tocken from server
-            fetch('http://localhost:5050/api/users/token',{
-                method:"DELETE",
-                headers: {
-                    'token': session.access_server_key,
-                    'userid': session.profile.id
-                }}).then(response =>{
-                    if(!response.ok){
-                        console.log("Something went wrong");
-                        return;
-                    } 
-                    
-                    console.log("Logged Out");
-                    setJwt("");
-                    setUserData({});
-                    localStorage.removeItem('session');
-                });
-                
-            })
-    }    
-
-    async function getServerAccessTocken(response) {
-        fetch('http://localhost:5050/api/users/token',{
-            method:"GET",
-            headers: {
-                'token': response.credential,
-                "provider":"Google"
-            }
-            }).then(data => data.json()).then(data =>{
-                // get access key from server
-                const {access_server_key,ttl,userId} = data;
-                console.log(access_server_key,ttl);
-                // store it localy
-                const session = JSON.parse(localStorage.getItem('session'));
-                // update the session with the access_server_key, provider
-                localStorage.setItem('session', JSON.stringify({...session,access_server_key:access_server_key,provider:"Google"}));
-                fetchMyProfile(access_server_key,userId);
-                })
-            };
-
-    async function fetchMyProfile(access_server_key,userId){
-        // fetching users profile
+    // get profile data from server
+    function fetchMyProfile(access_server_key,userId){
+        // fetching users profile 
         fetch(`http://localhost:5050/api/users/profile/${userId}/me`,{
             method:"GET",
             headers: {
@@ -76,14 +72,45 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
             localStorage.setItem('session', JSON.stringify({...session,profile:{},access_server_key:undefined,provider:undefined}));
         });
     }
+
+    // handle sign out
+    function handleSignOut(event) {
+        event.preventDefault()
+        google.accounts.id.disableAutoSelect()
+        google.accounts.id.revoke(localStorage.getItem("googleToken"),()=>{
+            revokeServerToken(()=>{
+                console.log("Logged Out");
+                    setJwt("");
+                    setUserData({});
+                });
+        })
+
+    }    
+
+    // get the access tocken from server
+    async function getServerAccessTockenCallback(response) {
+        getServerAccessTocken(response.credential,"Google",(data)=>{
+            // get access key from server
+            const {access_server_key /*,ttl*/ ,userId} = data;
+
+            // store it localy
+            const session = JSON.parse(localStorage.getItem('session'));
+            // update the session with the access_server_key, provider
+            localStorage.setItem('session', JSON.stringify({...session,access_server_key:access_server_key,provider:"Google"}));
+            fetchMyProfile(access_server_key,userId);
+            })
+        };
     
+    // if there is session data from google set them as profile data
     useEffect(() => {
-        // if there is session data from google set them as profile data
         const session = JSON.parse(localStorage.getItem('session'));
         if(session!== null){
             if(session.provider !== undefined){
                 if(session.provider === "Google") {
-                    fetchMyProfile(session.access_server_key,session.profile.userId)
+                    if(session.profile === undefined){
+                        return;
+                    }
+                    fetchMyProfile(session.access_server_key,session.profile.id)
                     return;
                 }
             }
@@ -101,7 +128,7 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
 
         google.accounts.id.initialize({
             client_id: credentials.GOOGLE_CLIENT_ID,
-            callback: getServerAccessTocken,
+            callback: getServerAccessTockenCallback,
             auto_select: true,
             cancel_on_tap_outside: false
         })
