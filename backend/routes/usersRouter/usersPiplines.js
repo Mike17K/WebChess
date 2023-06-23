@@ -50,60 +50,89 @@ export const deleteTokenPipe = [(req,res,next)=>validateAccessKey(req.headers['u
 ////////////////////////////////
 //       getTokenPipe        //
 ////////////////////////////////
+async function googleHandler(req,res,next){
+    const code = req.headers['code'];
+        
+    const decoded_data = jwt_decode(code);
+    const {email,aud,iss} = decoded_data;
+    if(!email || !aud || !iss) return res.sendStatus(500);
+    
+    if(iss !== 'https://accounts.google.com') return res.sendStatus(400); // validate iss
+    
+    // serch in database for account with this email and id of aud
+    const user = await usersApi.findUser({where: {AND: [{ email: email },{ aud:aud },],},});
+    
+    if(!user) return res.sendStatus(500);
+    
+    req.userId = user.id;
+
+    next();
+}
+async function discordHandler(req,res,next){
+    const code = req.headers['code'];
+    if(!code) return res.sendStatus(500);
+    // validating the code
+    const responce = await fetch(`https://discord.com/api/v10/users/@me`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${code}`
+        }
+        }).then(responce=>responce.json()).catch(err=>console.log(err));
+
+        if(responce.message === 'Bad credentials'){
+        return res.sendStatus(500);
+        }
+    
+    const {id,username} = responce;
+    if(!id || !username) return res.sendStatus(500);
+    
+    // serch in database for account with this email and id of aud
+    const user = await usersApi.findUser({where: {AND: [{ id: id },{ name:username },],},});
+    
+    if(!user) return res.sendStatus(500);
+    
+    req.userId = user.id;
+    
+    next();
+}
+async function githubHandler(req,res,next){
+    const code = req.headers['code'];
+    // validating the code
+    const responce = await fetch(`https://api.github.com/user`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `token ${code}`
+        }
+    }).then(responce=>responce.json()).catch(err=>console.log(err));
+    
+    if(responce.message === 'Bad credentials'){
+        return res.sendStatus(500)
+    }
+    
+    const {name,node_id} = responce;
+    if(!name || !node_id) return res.sendStatus(500);
+    
+    // serch in database for account with this email and id of aud
+    const user = await usersApi.findUser({where: {AND: [{ name: name },{ aud:node_id },],},});
+    
+    if(!user) return res.sendStatus(500);
+    
+    req.userId = user.id;
+    
+    next();
+}
 
 async function checkTokenWithProvider(req,res,next){
     const provider = req.headers['provider'];
     
     if(provider === "Google"){
-        const code = req.headers['code'];
-        
-        const decoded_data = jwt_decode(code);
-        const {email,aud,iss} = decoded_data;
-        
-        if(iss !== 'https://accounts.google.com') return res.sendStatus(400); // validate iss
-        
-        // serch in database for account with this email and id of aud
-        const user = await usersApi.findUser({where: {AND: [{ email: email },{ aud:aud },],},});
-        
-        if(!user) return res.sendStatus(500);
-        
-        req.userId = user.id;
-
-        next();
+        googleHandler(req,res,next);
         return
     }else if(provider === "Discord"){
-        // const token = req.headers['token']; // this will probably be the code
-        // TODO // fetching from if the provider discord has aproved this key
-        
-        // validate that the user of the provider is the same with this one in the base they will have the same id
-        // if they dont redirect to register page
-        
-        next();
+        discordHandler(req,res,next)        
         return
     }else if(provider === "Github"){
-        const code = req.headers['code'];
-        // validating the code
-        const responce = await fetch(`https://api.github.com/user`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `token ${code}`
-            }
-          }).then(responce=>responce.json()).catch(err=>console.log(err));
-
-          if(responce.message === 'Bad credentials'){
-            return res.sendStatus(500)
-          }
-
-        const {name,node_id} = responce;
-        
-        // serch in database for account with this email and id of aud
-        const user = await usersApi.findUser({where: {AND: [{ name: name },{ aud:node_id },],},});
-        
-        if(!user) return res.sendStatus(500);
-        
-        req.userId = user.id;
-        
-        next();
+        githubHandler(req,res,next)
         return
     }
 

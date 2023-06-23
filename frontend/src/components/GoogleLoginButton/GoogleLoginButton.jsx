@@ -57,7 +57,6 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
             }
         }).then(data => data.json()).then(profile =>{
             // got the profile data from server
-            console.log(profile);
             const session = JSON.parse(localStorage.getItem('session'));
             // update the session data with the profile data
             localStorage.setItem('session', JSON.stringify({...session,profile:profile}));
