@@ -30,7 +30,10 @@ function revokeServerToken(callback) {
             } 
             callback();
             localStorage.removeItem('session');
-        });
+        }).catch(err=> {
+            console.log(err)
+        }
+    );
 
     }
     
@@ -44,7 +47,10 @@ function revokeServerToken(callback) {
         }).then(data => data.json()).then(data =>{
             // get access key from server
             callback(data);
-        })
+        }).catch(err=> {
+            console.log(err)
+        }
+    );
     }
     
     

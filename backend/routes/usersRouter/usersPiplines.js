@@ -60,7 +60,7 @@ async function googleHandler(req,res,next){
     if(iss !== 'https://accounts.google.com') return res.sendStatus(400); // validate iss
     
     // serch in database for account with this email and id of aud
-    const user = await usersApi.findUser({where: {AND: [{ email: email },{ aud:aud },],},});
+    const user = await usersApi.findUser({where: {AND: [{ email: email },{ aud:aud },{authProvider:"Google"}],},});
     
     if(!user) return res.sendStatus(500);
     
@@ -87,7 +87,7 @@ async function discordHandler(req,res,next){
     if(!id || !username) return res.sendStatus(500);
     
     // serch in database for account with this email and id of aud
-    const user = await usersApi.findUser({where: {AND: [{ id: id },{ name:username },],},});
+    const user = await usersApi.findUser({where: {AND: [{ id: id },{ name:username },{authProvider:"Discord"}],},});
     
     if(!user) return res.sendStatus(500);
     
@@ -113,12 +113,65 @@ async function githubHandler(req,res,next){
     if(!name || !node_id) return res.sendStatus(500);
     
     // serch in database for account with this email and id of aud
-    const user = await usersApi.findUser({where: {AND: [{ name: name },{ aud:node_id },],},});
+    const user = await usersApi.findUser({where: {AND: [{ name: name },{ aud:node_id },{authProvider:"Github"}],},});
     
     if(!user) return res.sendStatus(500);
     
     req.userId = user.id;
     
+    next();
+}
+
+async function customFormHandler(req,res,next){
+    const name = req.headers['name'];
+    const password = req.headers['password'];
+    if(!name || !password) return res.sendStatus(500);
+
+    // regex test the name and password
+    const nameRegex = /^[A-Za-z0-9]+$/;
+    const passwordRegex = /^[A-Za-z0-9]+$/;
+
+    const isNameValid = nameRegex.test(name);
+    const isPasswordValid = passwordRegex.test(password);
+
+    if (!isNameValid || !isPasswordValid) {
+    // Invalid name or password, handle the error or send an appropriate response
+    return res.sendStatus(400); // Bad Request
+    }
+    
+    //find user with this name 
+    const user = await usersApi.findUser({where: {AND: [{ name: name },{authProvider:"CustomForm"}],},});
+    if(!user) return res.sendStatus(500);
+    if(!user.salt) return res.sendStatus(500);
+    
+    // TODO
+    // in the register page this is how to make a salt for a user
+    // const salt = crypto.randomBytes(16).toString('hex');
+    /*
+    // register password encryption
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.createHash('sha256');
+    hash.update(enteredPassword + user.salt);
+    const hashedEnteredPassword = hash.digest('hex');   
+    // store the user in the database
+    const user = await usersApi.createUser({
+        name: enteredName,
+        password: hashedEnteredPassword,
+        salt: salt,
+        authProvider: "CustomForm"
+    });    
+    */
+
+    // Hash the password
+    const hash = crypto.createHash('sha256');
+    hash.update(enteredPassword + user.salt);
+    const hashedEnteredPassword = hash.digest('hex');
+    
+    // check if the password is correct
+    if(user.password !== hashedEnteredPassword) return res.sendStatus(500);
+
+    req.userId = user.id;
+
     next();
 }
 
@@ -133,6 +186,9 @@ async function checkTokenWithProvider(req,res,next){
         return
     }else if(provider === "Github"){
         githubHandler(req,res,next)
+        return
+    }else if(provider === "CustomForm"){
+        customFormHandler(req,res,next)
         return
     }
 
