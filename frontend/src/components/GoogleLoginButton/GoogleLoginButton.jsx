@@ -1,131 +1,28 @@
 import React, { useEffect } from 'react'
 import credentials from "../../credentials.json"
-//import google from 'google';
 import './GoogleLoginButton.css';
-
-
-// General functions for all sign in processes
-
-function revokeServerToken(callback) {
-    const session = JSON.parse(localStorage.getItem('session'));
-    if(session === null) return;
-    if(session.provider === undefined) return;
-    if(session.profile === undefined) return;
-    if(session.access_server_key === undefined) return;
-    if(session.profile.id === undefined) return;
-
-    // revoke the access tocken from server
-    fetch('http://localhost:5050/api/users/token',{
-        method:"DELETE",
-        headers: {
-            'token': session.access_server_key,
-            'userid': session.profile.id
-        }}).then(response =>{
-            if(!response.ok){
-                console.log("Something went wrong");
-                return;
-            } 
-            callback();
-            localStorage.removeItem('session');
-        }).catch(err=> {
-            console.log(err)
-        }
-    );;
-
-}
-
-function getServerAccessTocken(code,provider,callback=(data)=>{}) {
-    fetch('http://localhost:5050/api/users/token',{
-        method:"GET",
-        headers: {
-            'code': code,
-            "provider":provider
-        }
-        }).then(data => data.json()).then(data =>{
-            // get access key from server
-            callback(data);
-            }).catch(err=> {
-                console.log(err)
-            }
-        );
-}
-
+import outerLoginProvider from '../../hooks/outerLoginProvider/outerLoginProvider';
 
 /* global google */
-export default function GoogleLoginButton({setJwt,userData,setUserData}) {
-    // get profile data from server
-    function fetchMyProfile(access_server_key,userId){
-        // fetching users profile 
-        fetch(`http://localhost:5050/api/users/profile/${userId}/me`,{
-            method:"GET",
-            headers: {
-                'access_server_key': access_server_key,
-            }
-        }).then(data => data.json()).then(profile =>{
-            // got the profile data from server
-            const session = JSON.parse(localStorage.getItem('session'));
-            // update the session data with the profile data
-            localStorage.setItem('session', JSON.stringify({...session,profile:profile}));
-        
-            setUserData(profile);
-            setJwt(session.access_server_key);
-            
-        }).catch(err=> {
-            console.log(err)
-            // if the profile cant be accessed remove it from session
-            const session = JSON.parse(localStorage.getItem('session'));
-            localStorage.setItem('session', JSON.stringify({...session,profile:{},access_server_key:undefined,provider:undefined}));
-        });
-    }
+export default function GoogleLoginButton(props) {    
+   
+    const [profile,signOut,getProfileCallback] = outerLoginProvider({provider:"Google"})
+    console.log("GoogleLoginButton profile: ",profile)
 
     // handle sign out
     function handleSignOut(event) {
         event.preventDefault()
         google.accounts.id.disableAutoSelect()
-        google.accounts.id.revoke(localStorage.getItem("googleToken"),()=>{
-            revokeServerToken(()=>{
-                console.log("Logged Out");
-                    setJwt("");
-                    setUserData({});
-                });
-        })
-
+        google.accounts.id.revoke(localStorage.getItem("googleToken"));
+        signOut();
     }    
 
     // get the access tocken from server
     async function getServerAccessTockenCallback(response) {
-        getServerAccessTocken(response.credential,"Google",(data)=>{
-            // get access key from server
-            const {access_server_key /*,ttl*/ ,userId} = data;
-
-            // store it localy
-            const session = JSON.parse(localStorage.getItem('session'));
-            // update the session with the access_server_key, provider
-            localStorage.setItem('session', JSON.stringify({...session,access_server_key:access_server_key,provider:"Google"}));
-            fetchMyProfile(access_server_key,userId);
-            })
+        getProfileCallback({code:response.credential})
         };
-    
-    // if there is session data from google set them as profile data
-    useEffect(() => {
-        const session = JSON.parse(localStorage.getItem('session'));
-        if(session!== null){
-            if(session.provider !== undefined){
-                if(session.provider === "Google") {
-                    if(session.profile === undefined){
-                        return;
-                    }
-                    fetchMyProfile(session.access_server_key,session.profile.id)
-                    return;
-                }
-            }
-        }
-        /* eslint-disable react-hooks/exhaustive-deps */
-    }, [])
-
 
     useEffect(() => {
-        
         if(credentials.GOOGLE_CLIENT_ID === undefined) {
             console.error("Google Client ID is undefined in the /src/credentials.json file")
             return
@@ -150,20 +47,20 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
 
         //google.accounts.id.prompt();
     /* eslint-disable react-hooks/exhaustive-deps */
-    }, [userData])
+    }, [])
 
   return (
     <>
         {
-        userData.authProvider === "Google" && (
+        profile.authProvider === "Google" && (
             <div onClick={handleSignOut}
             className='logout-button rounded relative'
             >
-                <img src={`${userData.picture}`} alt="profile img" />
+                <img src={`${profile.picture}`} alt="profile img" />
                 <div className='flex text-white '>
                     <div className='flex flex-col text-white'>
                 <span className=" text-[14px] font-bold">Αποσύνδεση</span>
-                <span className=" text-[12px]">{userData.email}</span>
+                <span className=" text-[12px]">{profile.email}</span>
                     </div>
                 </div>
 
@@ -175,7 +72,7 @@ export default function GoogleLoginButton({setJwt,userData,setUserData}) {
             )
         }
         {
-        userData.authProvider !== "Google"  && (
+        profile.authProvider !== "Google"  && (
             <div id="google_login_button"></div>
             )
         }

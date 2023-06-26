@@ -7,141 +7,33 @@ import queryString from 'query-string';
 
 import './DiscordLoginButton.css';
 
-// General functions for all sign in processes
+import outerLoginProvider from '../../hooks/outerLoginProvider/outerLoginProvider';
 
-function revokeServerToken(callback) {
-    const session = JSON.parse(localStorage.getItem('session'));
-    if(session === null) return;
-    if(session.provider === undefined) return;
-    if(session.profile === undefined) return;
-    if(session.access_server_key === undefined) return;
-    if(session.profile.id === undefined) return;
+export default function DiscordLoginButton(props) {    
 
-    // revoke the access tocken from server
-    fetch('http://localhost:5050/api/users/token',{
-        method:"DELETE",
-        headers: {
-            'token': session.access_server_key,
-            'userid': session.profile.id
-        }}).then(response =>{
-            if(!response.ok){
-                console.log("Something went wrong");
-                return;
-            } 
-            callback();
-            localStorage.removeItem('session');
-        }).catch(err=> {
-            console.log(err)
-        }
-    );
+    const [profile,signOut,getProfileCallback] = outerLoginProvider({provider:"Discord"});
 
-    }
+    const DISCORD_IDENTIFY_URL = `https://discord.com/api/oauth2/authorize?client_id=${credentials.DISCORD_CLIENT_ID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%3Fprovider%3DDiscord&response_type=code&scope=identify`;
     
-    function getServerAccessTocken(code,provider,callback=(data)=>{}) {
-        fetch('http://localhost:5050/api/users/token',{
-            method:"GET",
-            headers: {
-                'code': code,
-                "provider":provider
-            }
-        }).then(data => data.json()).then(data =>{
-            // get access key from server
-            callback(data);
-        }).catch(err=> {
-            console.log(err)
-        }
-    );
-    }
-    
-    
-    export default function DiscordLoginButton({setJwt,userData,setUserData}) {    
-        function fetchMyProfile(access_server_key,userId){
-        // fetching users profile 
-        fetch(`http://localhost:5050/api/users/profile/${userId}/me`,{
-            method:"GET",
-            headers: {
-                'access_server_key': access_server_key,
-            }
-        }).then(data => data.json()).then(profile =>{
-
-            // got the profile data from server
-            const session = JSON.parse(localStorage.getItem('session'));
-            // update the session data with the profile data
-            localStorage.setItem('session', JSON.stringify({...session,profile:profile}));
-
-            setUserData(profile);
-            setJwt(session.access_server_key);
-            
-        }).catch(err=> {
-            console.log(err)
-            // if the profile cant be accessed remove it from session
-            const session = JSON.parse(localStorage.getItem('session'));
-            localStorage.setItem('session', JSON.stringify({...session,profile:{},access_server_key:undefined,provider:undefined}));
-        });
-    }
-
-    // handle sign out
-    function handleSignOut(event) {
-        event.preventDefault()
-        revokeServerToken(()=>{
-                console.log("Logged Out");
-                    setJwt("");
-                    setUserData({});
-                });
-    }
-
-    
-    // if there is session data from Discord set them as profile data
-    useEffect(() => {
-        const session = JSON.parse(localStorage.getItem('session'));
-        if(session!== null){
-            if(session.provider !== undefined){
-                if(session.provider === "Discord") {
-                    if(session.profile === undefined){
-                        return;
-                    }
-                    fetchMyProfile(session.access_server_key,session.profile.id)
-                    return;
-                }
-            }
-        }
-        /* eslint-disable react-hooks/exhaustive-deps */
-    }, [])
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    const DISCORD_IDENTIFY_URL = `https://discord.com/api/oauth2/authorize?client_id=${credentials.DISCORD_CLIENT_ID}&redirect_uri=http%3A%2F%2Flocalhost%3A5050%2Fapi%2Fusers%2Fauth%2Fdiscord%2Fredirect&response_type=code&scope=identify`;
-
     const location = useLocation();
     const queryParams = queryString.parse(location.search);
     
     useEffect(()=>{
-        const session = JSON.parse(localStorage.getItem('session'));
-        if(session !== null){
-            if(queryParams.access_token === undefined) return;
-        }
-
-        getServerAccessTocken(queryParams.access_token,"Discord",(data)=>{
-            // get access key from server
-            const {access_server_key /*,ttl*/ ,userId} = data;
-    
-            // store it localy
-            const session = JSON.parse(localStorage.getItem('session'));
-            // update the session with the access_server_key, provider
-            localStorage.setItem('session', JSON.stringify({...session,access_server_key:access_server_key,provider:"Discord"}));
-            fetchMyProfile(access_server_key,userId);
-            //window.location.href = 'http://localhost:3000/login'
-            })
+        if(queryParams.provider !== "Discord") return;
+        if(queryParams.code === undefined) return;
+        
+        console.log("fetching discord profile")
+        getProfileCallback({code:queryParams.code},(profile)=>{
+            window.location.href = 'http://localhost:3000/login'
+        });
         
     /* eslint-disable react-hooks/exhaustive-deps */
     },[])
-   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+   
   return (
-
-
       <>
         {
-            userData.authProvider !== "Discord" && (
+            profile.authProvider !== "Discord" && (
         <button id="info" 
         className='discord-button rounded'
         onClick={(e)=> window.location.href = DISCORD_IDENTIFY_URL } >
@@ -166,16 +58,16 @@ function revokeServerToken(callback) {
             )
         }
         {
-            userData.authProvider === "Discord" && (
+            profile.authProvider === "Discord" && (
         <button id="info" 
         className='discord-button rounded relative'
-        onClick={handleSignOut} >
-        {/*`https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`*/}
-        <img className="w-[22px] h-[22px] rounded-full ml-[10px]" src={`${userData.picture}`} alt="Discord Avatar" />
+        onClick={(e)=>signOut()} >
+        {/*`https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`*/}
+        <img className="w-[22px] h-[22px] rounded-full ml-[10px]" src={`${profile.picture}`} alt="Discord Avatar" />
 
         <div className='block text-sm my-auto px-2 leading-[15px]'>
             <div className='block text-white text-[14px] font-bold text-start '>Log out</div>
-            <div className='block text-white text-[12px] text-start'>{userData.name}#{userData.discriminator}</div>
+            <div className='block text-white text-[12px] text-start'>{profile.name}#{profile.discriminator}</div>
             
         </div>
         

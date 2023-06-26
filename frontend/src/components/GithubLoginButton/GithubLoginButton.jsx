@@ -7,131 +7,25 @@ import queryString from 'query-string';
 
 import './GithubLoginButton.css';
 
-// General functions for all sign in processes
+import outerLoginProvider from '../../hooks/outerLoginProvider/outerLoginProvider';
 
-function revokeServerToken(callback) {
-    const session = JSON.parse(localStorage.getItem('session'));
-    if(session === null) return;
-    if(session.provider === undefined) return;
-    if(session.profile === undefined) return;
-    if(session.access_server_key === undefined) return;
-    if(session.profile.id === undefined) return;
 
-    // revoke the access tocken from server
-    fetch('http://localhost:5050/api/users/token',{
-        method:"DELETE",
-        headers: {
-            'token': session.access_server_key,
-            'userid': session.profile.id
-        }}).then(response =>{
-            if(!response.ok){
-                console.log("Something went wrong");
-                return;
-            } 
-            callback();
-            localStorage.removeItem('session');
-        }).catch(err=> {
-            console.log(err)
-        }
-    );
+export default function GithubLoginButton(props) {    
+    const [profile,signOut,getProfileCallback] = outerLoginProvider({provider:"Github"});
 
-    }
-    
-    function getServerAccessTocken(code,provider,callback=(data)=>{}) {
-        fetch('http://localhost:5050/api/users/token',{
-            method:"GET",
-            headers: {
-                'code': code,
-                "provider":provider
-            }
-        }).then(data => data.json()).then(data =>{
-            // get access key from server
-            callback(data);
-        }).catch(err=> {
-            console.log(err)
-        }
-    );
-    }
-    
-    
-    export default function GithubLoginButton({setJwt,userData,setUserData}) {    
-        function fetchMyProfile(access_server_key,userId){
-            console.log("fetchinig github profile 2")
-        // fetching users profile 
-        fetch(`http://localhost:5050/api/users/profile/${userId}/me`,{
-            method:"GET",
-            headers: {
-                'access_server_key': access_server_key,
-            }
-        }).then(data => data.json()).then(profile =>{
-
-            // got the profile data from server
-            const session = JSON.parse(localStorage.getItem('session'));
-            // update the session data with the profile data
-            localStorage.setItem('session', JSON.stringify({...session,profile:profile}));
-
-            setUserData(profile);
-            setJwt(session.access_server_key);
-            
-        }).catch(err=> {
-            console.log(err)
-            // if the profile cant be accessed remove it from session
-            const session = JSON.parse(localStorage.getItem('session'));
-            localStorage.setItem('session', JSON.stringify({...session,profile:{},access_server_key:undefined,provider:undefined}));
-        });
-    }
-
-    // handle sign out
-    function handleSignOut(event) {
-        event.preventDefault()
-        revokeServerToken(()=>{
-                console.log("Logged Out");
-                    setJwt("");
-                    setUserData({});
-                });
-    }
-
-    
-    // if there is session data from Github set them as profile data
-    useEffect(() => {
-        const session = JSON.parse(localStorage.getItem('session'));
-        if(session!== null){
-            if(session.provider !== undefined){
-                if(session.provider === "Github") {
-                    if(session.profile === undefined){
-                        return;
-                    }
-                    fetchMyProfile(session.access_server_key,session.profile.id)
-                    return;
-                }
-            }
-        }
-        /* eslint-disable react-hooks/exhaustive-deps */
-    }, [])
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     const GITHUB_IDENTIFY_URL = `https://github.com/login/oauth/authorize?client_id=${credentials.GITHUB_CLIENT_ID}&redirect_uri=`;
     
     const location = useLocation();
     const queryParams = queryString.parse(location.search);
     
     useEffect(()=>{
-        const session = JSON.parse(localStorage.getItem('session'));
-        if(session !== null){
-            if(queryParams.github_access_token === undefined) return;
-        }
-
-        getServerAccessTocken(queryParams.github_access_token,"Github",(data)=>{
-            // get access key from server
-            const {access_server_key /*,ttl*/ ,userId} = data;
+        if(queryParams.provider !== "Github") return;
+        if(queryParams.code === undefined) return;
     
-            // store it localy
-            const session = JSON.parse(localStorage.getItem('session'));
-            // update the session with the access_server_key, provider
-            localStorage.setItem('session', JSON.stringify({...session,access_server_key:access_server_key,provider:"Github"}));
-            fetchMyProfile(access_server_key,userId);
-            //window.location.href = 'http://localhost:3000/login'
-            })
+        console.log("fetching github profile")
+        getProfileCallback({code:queryParams.code},(profile)=>{
+            window.location.href = 'http://localhost:3000/login'
+        });
         
     /* eslint-disable react-hooks/exhaustive-deps */
     },[])
@@ -140,16 +34,16 @@ function revokeServerToken(callback) {
   return (
       <>
         {
-            (userData.authProvider === "Github" ) && (
+            (profile.authProvider === "Github" ) && (
         <button id="info" 
         className='github-button rounded relative'
-        onClick={handleSignOut} >
+        onClick={(e)=>signOut()} >
         
-        <img className="w-[22px] h-[22px] rounded-full ml-[10px]" src={`${userData.picture}`} alt="Discord Avatar" />
+        <img className="w-[22px] h-[22px] rounded-full ml-[10px]" src={`${profile.picture}`} alt="Discord Avatar" />
 
         <div className='block text-sm my-auto px-2 leading-[15px]'>
             <div className='block text-white text-[14px] font-bold text-start '>Log out</div>
-            <div className='block text-white text-[12px] text-start'>{userData.name}</div>
+            <div className='block text-white text-[12px] text-start'>{profile.name}</div>
         </div>
         
         <div className='mx-[10px] flex absolute right-0'>
@@ -159,7 +53,7 @@ function revokeServerToken(callback) {
             )
         }
         {
-            (userData.authProvider !== "Github" ) && (
+            (profile.authProvider !== "Github" ) && (
         <button id="info" 
         className='github-button rounded'
         onClick={(e)=> window.location.href = GITHUB_IDENTIFY_URL } >

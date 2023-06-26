@@ -12,27 +12,46 @@ datasource db {
 
 model User {
   id       String  @id @default(uuid())
-  email    String?  @unique
-  name     String  @unique
-  password String
-  salt String?
+  // login fields
+  username     String  @unique
+  password     String
+  salt         String?
 
   aud     String? @default(uuid())
   authProvider String?
-  picture String?
+
+  // profile fields
+  profile    Profile?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+  
   role      Role      @default(USER)
-
-  score Int @default(0)
 
   friends  User[] @relation("Friends")
   friendOf User[] @relation("Friends")
 
   completedTactics Tactic[]
   accessTokens Token[]
+}
+
+model Profile {
+  id String @id @default(uuid())
+
+  profilename    String  @unique
+  email    String?  @unique
+  picture String?
+  bio     String?
+
+  score Int @default(0)
+
+  user User @relation(fields: [userid], references: [id])
+  userid String @unique
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model Token{

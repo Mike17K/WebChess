@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import jwt_decode from "jwt-decode";
-
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const usersApi = await import('../../api/usersApi.js');
 
@@ -9,10 +11,10 @@ const usersApi = await import('../../api/usersApi.js');
 ////////////////////////////////
 
 async function validateAccessKey(profileId,token,callback){
-    if(!profileId) return;
+    if(!profileId ) return;
     
     // check if there is this token in the userId
-    const isValid = await usersApi.profileTokenValidation({profileId:profileId,token:token});
+    const isValid = await usersApi.profileTokenValidation({profileId:profileId,token:token}).catch(err=>console.log(err));
 
     if(!isValid) return;  // tell the client that there is a server error with the accesskey
     callback();
@@ -22,7 +24,7 @@ async function sendProfile(req,res){
     const profileId = req.params.profileId;
 
     // get user data
-    const userProfile = await usersApi.getProfile({profileId:profileId,userMode:"OWNER"});
+    const userProfile = await usersApi.getProfile({profileId:profileId,userMode:"OWNER"}).catch(err=>console.log(err));
     
     // send user data
     res.json(userProfile);
@@ -41,6 +43,42 @@ async function deleteToken(req,res){
 
     if (!userId || !token) return res.sendStatus(400);
 
+    const user = await usersApi.findUser({where: {id: userId},});
+    if(!user) return res.sendStatus(400);
+    // remove token from auth provider // TODO test if works fine
+    let response = null;
+    if(user.authProvider === "Google"){
+        response = await fetch(`https://oauth2.googleapis.com/revoke?token=${token}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+            }).then(response=>response.json()).catch(err=>console.log(err));
+    }else if(user.authProvider === "Github"){
+        response = await fetch(`https://api.github.com/applications/${process.env.GITHUB_CLIENT_ID}/token`, {
+            method: 'DELETE',
+            headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-GitHub-Api-Version': '2022-11-28'
+            }
+            }).then(response=>response.json()).catch(err=>console.log(err));
+    }else if(user.authProvider === "Discord"){
+        response = await fetch(`https://discord.com/api/v10/oauth2/token/revoke`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                client_id: process.env.DISCORD_CLIENT_ID,
+                client_secret: process.env.DISCORD_CLIENT_SECRET,
+                token: token,
+              }),
+            }).then(response=>response.json()).catch(err=>console.log(err));
+    }
+
+    console.log("Logout response: ",response);
+
+    // remove token from database
     const status = await usersApi.deleteToken(userId,token);
     res.sendStatus(status);
 }
@@ -52,6 +90,7 @@ export const deleteTokenPipe = [(req,res,next)=>validateAccessKey(req.headers['u
 ////////////////////////////////
 async function googleHandler(req,res,next){
     const code = req.headers['code'];
+    if(!code) return res.sendStatus(500); // here we had error if code == undefined its not exitig
         
     const decoded_data = jwt_decode(code);
     const {email,aud,iss} = decoded_data;
@@ -60,34 +99,44 @@ async function googleHandler(req,res,next){
     if(iss !== 'https://accounts.google.com') return res.sendStatus(400); // validate iss
     
     // serch in database for account with this email and id of aud
-    const user = await usersApi.findUser({where: {AND: [{ email: email },{ aud:aud },{authProvider:"Google"}],},});
+    const user = await usersApi.findUser({
+        where: {
+          AND: [
+            { aud: aud },
+            { authProvider: "Google" },
+          ],
+        },
+        include: {
+          profile: true
+        },
+      }).catch(err=>console.log(err));
     
     if(!user) return res.sendStatus(500);
+    if(user.profile.email !== email) return res.sendStatus(500);
     
     req.userId = user.id;
-
     next();
 }
 async function discordHandler(req,res,next){
     const code = req.headers['code'];
     if(!code) return res.sendStatus(500);
     // validating the code
-    const responce = await fetch(`https://discord.com/api/v10/users/@me`, {
+    const response = await fetch(`https://discord.com/api/v10/users/@me`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${code}`
         }
-        }).then(responce=>responce.json()).catch(err=>console.log(err));
+        }).then(response=>response.json()).catch(err=>console.log(err));
 
-        if(responce.message === 'Bad credentials'){
+        if(response.message === 'Bad credentials'){
         return res.sendStatus(500);
         }
     
-    const {id,username} = responce;
+    const {id,username} = response;
     if(!id || !username) return res.sendStatus(500);
     
     // serch in database for account with this email and id of aud
-    const user = await usersApi.findUser({where: {AND: [{ id: id },{ name:username },{authProvider:"Discord"}],},});
+    const user = await usersApi.findUser({where: {AND: [{ id: id },{ name:username },{authProvider:"Discord"}],},}).catch(err=>console.log(err));
     
     if(!user) return res.sendStatus(500);
     
@@ -97,23 +146,24 @@ async function discordHandler(req,res,next){
 }
 async function githubHandler(req,res,next){
     const code = req.headers['code'];
+    if(!code) return res.sendStatus(500);
     // validating the code
-    const responce = await fetch(`https://api.github.com/user`, {
+    const response = await fetch(`https://api.github.com/user`, {
         method: 'GET',
         headers: {
             'Authorization': `token ${code}`
         }
-    }).then(responce=>responce.json()).catch(err=>console.log(err));
+    }).then(response=>response.json()).catch(err=>console.log(err));
     
-    if(responce.message === 'Bad credentials'){
+    if(response.message === 'Bad credentials'){
         return res.sendStatus(500)
     }
     
-    const {name,node_id} = responce;
+    const {name,node_id} = response;
     if(!name || !node_id) return res.sendStatus(500);
     
     // serch in database for account with this email and id of aud
-    const user = await usersApi.findUser({where: {AND: [{ name: name },{ aud:node_id },{authProvider:"Github"}],},});
+    const user = await usersApi.findUser({where: {AND: [{ name: name },{ aud:node_id },{authProvider:"Github"}],},}).catch(err=>console.log(err));
     
     if(!user) return res.sendStatus(500);
     
@@ -140,7 +190,7 @@ async function customFormHandler(req,res,next){
     }
     
     //find user with this name 
-    const user = await usersApi.findUser({where: {AND: [{ name: name },{authProvider:"CustomForm"}],},});
+    const user = await usersApi.findUser({where: {AND: [{ name: name },{authProvider:"CustomForm"}],},}).catch(err=>console.log(err));
     if(!user) return res.sendStatus(500);
     if(!user.salt) return res.sendStatus(500);
     
@@ -177,7 +227,7 @@ async function customFormHandler(req,res,next){
 
 async function checkTokenWithProvider(req,res,next){
     const provider = req.headers['provider'];
-    
+
     if(provider === "Google"){
         googleHandler(req,res,next);
         return
@@ -193,6 +243,21 @@ async function checkTokenWithProvider(req,res,next){
     }
 
 }
+
+function generateAccessToken(user) {
+    return jwt.sign({ name: user.name, userId: user.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' });
+}
+/*
+jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        if (err) {
+            console.log(err);
+            return res.sendStatus(403);
+        }
+        console.log(token)
+        req.user = user;
+        next();
+    })
+    */
 
 async function generateToken(req,res){
     const access_server_key = crypto.randomBytes(64).toString('hex');

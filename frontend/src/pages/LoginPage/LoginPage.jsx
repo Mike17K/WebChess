@@ -104,8 +104,8 @@ export default function LoginPage(props) {
     <div className='w-3/5 h-1 border-t border-gray-300 my-4'></div>
 
     <div className='my-2 flex flex-col gap-2'>
-    <GoogleLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>
-    <DiscordLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>
+    <GoogleLoginButton />
+    <DiscordLoginButton />
     <GithubLoginButton setJwt={setJwt} userData={userData} setUserData={setUserData}/>
     </div>
     

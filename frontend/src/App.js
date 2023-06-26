@@ -32,6 +32,8 @@ function App(props) {
       </BrowserRouter>
       <button onClick={(e) => props.increaseCounter()}>icreaseeeeeeeee</button>
       {props.count}
+      <br/>
+      {props.profile}
     </>
   );
 }
