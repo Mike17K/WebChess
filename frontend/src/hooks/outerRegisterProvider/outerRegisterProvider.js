@@ -16,7 +16,9 @@ export default function outerRegisterProvider(props) {
                 "provider": props.provider
             })
         }).then(response => {
-            console.log(response);
+            if(response.redirected) {
+                window.location.href = response.url;
+            }
         }).catch(err => {
             console.log(err)
         }

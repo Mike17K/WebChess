@@ -17,9 +17,10 @@ export async function profileTokenValidation({ profileId, token }) {
 export async function getProfile({ profileId, userMode }) {
   if (userMode === "OWNER") {
     const user = await prisma.user.findFirst({
-      where: { id: profileId }
+      where: { id: profileId },
+      include: { profile: true },
     });
-    const response = { name: user.name, email: user.email, id: user.id, picture: user.picture, authProvider: user.authProvider };
+    const response = { name: user.profile.profilename, email: user.profile.email, id: user.id, picture: user.profile.picture, authProvider: user.authProvider };
     return response;
   }
   return {};

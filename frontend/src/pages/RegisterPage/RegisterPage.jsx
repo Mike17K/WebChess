@@ -33,17 +33,17 @@ export default function LoginPage(props) {
       <section>
         <div className="flex h-screen flex-col items-center justify-center">
           <h1 className="mb-4 text-4xl font-bold">Sign Up</h1>
-          <p className="text-gray-500">Register your account</p>
+          <p className="text-gray-500 mb-4">Register your account</p>
           <form onSubmit={onSubmitHandle} className="flex w-1/2 flex-col">
             <table className="w-full">
               <tbody>
-                <tr>
-                  <td className="py-2">
+                <tr className="py-2">
+                  <td>
                     <label htmlFor="name" className="text-gray-700">
                       User Name
                     </label>
                   </td>
-                  <td className="py-2">
+                  <td >
                     <input
                       pattern="[A-Za-z0-9]+"
                       required
@@ -55,13 +55,13 @@ export default function LoginPage(props) {
                     />
                   </td>
                 </tr>
-                <tr>
-                  <td className="py-2">
+                <tr className="py-2">
+                  <td >
                     <label htmlFor="password" className="text-gray-700">
                       Password
                     </label>
                   </td>
-                  <td className="py-2">
+                  <td >
                     <input
                       pattern="[A-Za-z0-9]+"
                       required
@@ -73,13 +73,13 @@ export default function LoginPage(props) {
                     />
                   </td>
                 </tr>
-                <tr>
-                  <td className="py-2">
+                <tr className="py-2">
+                  <td >
                     <label htmlFor="re-password" className="text-gray-700">
                       Password
                     </label>
                   </td>
-                  <td className="py-2">
+                  <td >
                     <input
                       pattern="[A-Za-z0-9]+"
                       required
@@ -93,6 +93,7 @@ export default function LoginPage(props) {
                 </tr>
               </tbody>
             </table>
+            <p className="text-gray-800 w-full text-[10px]">Already have an account? <a href="/login" className="text-blue-800 underline">log in</a><span className="w-1/2"></span></p>
             <button
               type="submit"
               className="mx-auto mt-4 w-[50%] rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"

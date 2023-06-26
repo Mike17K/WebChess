@@ -59,7 +59,7 @@ export default function outerLoginProvider(props) {
     }
     
     // get profile data from server
-    function fetchMyProfile(access_server_key,userId,callback=()=>{}) {
+    function fetchMyProfile(access_server_key,userId,callback=(profile)=>{}) {
         // fetching users profile 
         fetch(`http://localhost:5050/api/users/profile/${userId}/me`,{
             method:"GET",
@@ -69,7 +69,7 @@ export default function outerLoginProvider(props) {
         }).then(data => data.json()).then(profile =>{
             // got the profile data from server
             setProfile(profile);
-            callback();
+            callback(profile);
         }).catch(err=> {
             console.log(err)
             // if the profile cant be accessed remove it from session

@@ -16,7 +16,6 @@ export default function LoginPage(props) {
     const formData = new FormData(e.target);
     const name = formData.get("name");
     const password = formData.get("password");
-    console.log("fields: ", name, password);
 
     if (!name || !password) return;
 
@@ -37,7 +36,7 @@ export default function LoginPage(props) {
                 <tr>
                   <td className="py-2">
                     <label htmlFor="name" className="text-gray-700">
-                      User Name
+                      Name
                     </label>
                   </td>
                   <td className="py-2">
@@ -72,6 +71,7 @@ export default function LoginPage(props) {
                 </tr>
               </tbody>
             </table>
+            <p className="text-gray-800 w-full text-[10px]">Don't have an account? <a href="/register" className="text-blue-800 underline">Sign up</a><span className="w-1/2"></span></p>
             <button
               type="submit"
               className="mx-auto mt-4 w-[50%] rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"

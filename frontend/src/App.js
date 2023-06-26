@@ -6,21 +6,6 @@ import AdminPage from "./pages/AdminPage/AdminPage.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage/RegisterPage.jsx";
 
-import { connect } from "react-redux"
-
-const mapStateToProps = state => {
-  return {
-    count: state.counter.count,
-  }
-}
-
-const mapDispatchToProps = dispatch => {
-  return {
-    increaseCounter: () => dispatch({ type: 1 }),
-    decreaseCounter: () => dispatch({ type: 0 }),
-  }
-}
-
 function App(props) {
   return (
     <>
@@ -30,15 +15,10 @@ function App(props) {
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-
         </Routes>
       </BrowserRouter>
-      <button onClick={(e) => props.increaseCounter()}>icreaseeeeeeeee</button>
-      {props.count}
-      <br />
-      {props.profile}
     </>
   );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default App;

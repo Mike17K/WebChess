@@ -5,34 +5,21 @@ const INITIAL_STATE = {
     count: 0,
 };
 
-const counterReducer = (state = INITIAL_STATE.count, action) => {
-    switch (action.type) {
-        case 0:
-           return {
-             ...state, count: state.count + 1,
-           };
-        case 1:
-           return {
-              ...state, count: state.count - 1,
-           };
-         default: return state;
-        }
-    }
-
 const profileReducer = (state = INITIAL_STATE.profile, action) => {        
+    console.log("xcvbcgvhbxcvb: ", action.type);
     switch (action.type) {
         case "updateProfile":
-            if(action.profile) return state;
+            if(!action.profile) return state;
            return {
              ...state, profile: {...state.profile ,...action.profile},
            };
         case "clearProfile":
-            if(action.profile) return state;
+            if(!action.profile) return state;
            return {
               ...state, profile: {},
            };
         case "setProfile":
-            if(action.profile) return state;
+            if(!action.profile) return state;
            return {
               ...state, profile: {...action.profile},
            };
@@ -43,7 +30,6 @@ const profileReducer = (state = INITIAL_STATE.profile, action) => {
 
 
 const rootReducer = combineReducers({
-    counter: counterReducer,
     profile: profileReducer,
 });
 

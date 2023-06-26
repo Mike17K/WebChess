@@ -25,7 +25,7 @@ async function sendProfile(req, res) {
 
     // get user data
     const userProfile = await usersApi.getProfile({ profileId: profileId, userMode: "OWNER" }).catch(err => console.log(err));
-
+    
     // send user data
     res.json(userProfile);
 }
