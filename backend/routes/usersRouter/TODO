@@ -1,13 +1,9 @@
-Test if works fine
+Test if
 
-- remove token from auth provider for each provider
-
-- make register page
+- test if works fine w-ith redux redusers
 
 - change the buttons of login provider to work with the new register page by passing new url for each button to the rerver
 
-- make the local storage for the session info to work with redux only
-
-- make a login button provider  button to work as an interfase for all the buttons (high order component)
-
 - refresh tokens
+
+- register auth buttons

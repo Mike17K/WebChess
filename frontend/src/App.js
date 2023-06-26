@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import TacticsPage from "./pages/TacticsPage/TacticsPage.jsx";
 import AdminPage from "./pages/AdminPage/AdminPage.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage.jsx";
+import RegisterPage from "./pages/RegisterPage/RegisterPage.jsx";
 
 import { connect } from "react-redux"
 
@@ -15,8 +16,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    increaseCounter: () => dispatch({type:1}),
-    decreaseCounter: () => dispatch({type:0}),
+    increaseCounter: () => dispatch({ type: 1 }),
+    decreaseCounter: () => dispatch({ type: 0 }),
   }
 }
 
@@ -28,11 +29,13 @@ function App(props) {
           <Route path="/tactics" element={<TacticsPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
         </Routes>
       </BrowserRouter>
       <button onClick={(e) => props.increaseCounter()}>icreaseeeeeeeee</button>
       {props.count}
-      <br/>
+      <br />
       {props.profile}
     </>
   );
