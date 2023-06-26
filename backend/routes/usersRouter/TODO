@@ -1,9 +1,9 @@
 Test if
 
-- test if works fine w-ith redux redusers
-
 - change the buttons of login provider to work with the new register page by passing new url for each button to the rerver
 
 - refresh tokens
 
 - register auth buttons
+
+- tokens timeout ttl

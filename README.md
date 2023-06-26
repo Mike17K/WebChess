@@ -4,13 +4,22 @@ Using Prisma,mySQL,Express,React,Redux,tailwind i am building this project about
 
 # Views
 
-![Tactics Page View](/frontend/public/screenshots/tacticsPage.png)
+<img src="./frontend/public/screenshots/tacticsPage.png" alt="Tactics Page View" width="500" >
 
 The tactics page is the current main page of the project in the local path [/tactics](http://localhost:3000/tactics).
 
-![Admin Page View](/frontend/public/screenshots/adminPage.png)
+<img src="./frontend/public/screenshots/adminPage.png" alt="Admin Page View" width="500" >
 
 The admin page for now is on the local path [/admin](http://localhost:3000/admin).
+
+<img src="./frontend/public/screenshots/SignIn.png" alt="Log In Page View" width="500" >
+
+The login page for now is on the local path [/login](http://localhost:3000/login).
+
+<img src="./frontend/public/screenshots/SignUp.png" alt="Sign Up Page View" width="500" >
+
+
+The sign up for now is on the local path [/register](http://localhost:3000/register).
 
 # TO RUN
 
