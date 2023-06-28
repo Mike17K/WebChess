@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 
-import credentials from "../../credentials.json"
+import credentials from "../../../credentials.json"
 
 import { useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 
-import './GithubLoginButton.css';
+import './GithubButton.css';
 
-import outerLoginProvider from '../../hooks/outerLoginProvider/outerLoginProvider';
+import outerLoginProvider from "../../../hooks/outerProvider/outerLoginProvider";
 
 
 export default function GithubLoginButton(props) {    

@@ -5,8 +5,7 @@ const INITIAL_STATE = {
     count: 0,
 };
 
-const profileReducer = (state = INITIAL_STATE.profile, action) => {        
-    console.log("xcvbcgvhbxcvb: ", action.type);
+const profileReducer = (state = INITIAL_STATE.profile, action) => {
     switch (action.type) {
         case "updateProfile":
             if(!action.profile) return state;

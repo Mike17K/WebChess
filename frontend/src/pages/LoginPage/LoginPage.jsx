@@ -1,10 +1,10 @@
 import React from "react";
-import GoogleLoginButton from "../../components/GoogleLoginButton/GoogleLoginButton";
-import DiscordLoginButton from "../../components/DiscordLoginButton/DiscordLoginButton";
-import GithubLoginButton from "../../components/GithubLoginButton/GithubLoginButton";
+import GoogleLoginButton from "../../components/AuthButtons/GoogleButton/GoogleLoginButton";
+import DiscordLoginButton from "../../components/AuthButtons/DiscordButton/DiscordLoginButton";
+import GithubLoginButton from "../../components/AuthButtons/GithubButton/GithubLoginButton";
 
-import outerLoginProvider from "../../hooks/outerLoginProvider/outerLoginProvider";
-
+import outerLoginProvider from "../../hooks/outerProvider/outerLoginProvider";
+0
 export default function LoginPage(props) {
   const getProfileCallback = outerLoginProvider({
     provider: "CustomForm",

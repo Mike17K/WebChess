@@ -1,17 +1,17 @@
 import React, { useEffect } from 'react'
 
-import credentials from "../../credentials.json"
+import credentials from "../../../credentials.json"
 
 import { useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 
-import './DiscordLoginButton.css';
+import './DiscordButton.css';
 
-import outerLoginProvider from '../../hooks/outerLoginProvider/outerLoginProvider';
+import outerRegisterProvider from "../../../hooks/outerProvider/outerRegisterProvider";
 
-export default function DiscordLoginButton(props) {    
+export default function DiscordRegisterButton(props) {    
 
-    const [profile,signOut,getProfileCallback] = outerLoginProvider({provider:"Discord"});
+    const [profile,signOut,createUserCallback] = outerRegisterProvider({provider:"Discord"});
 
     const DISCORD_IDENTIFY_URL = `https://discord.com/api/oauth2/authorize?client_id=${credentials.DISCORD_CLIENT_ID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%3Fprovider%3DDiscord&response_type=code&scope=identify`;
     
@@ -23,8 +23,8 @@ export default function DiscordLoginButton(props) {
         if(queryParams.code === undefined) return;
         
         console.log("fetching discord profile")
-        getProfileCallback({code:queryParams.code},(profile)=>{
-            window.location.href = 'http://localhost:3000/login'
+        createUserCallback({code:queryParams.code},(profile)=>{
+            window.location.href = 'http://localhost:3000/register'
         });
         
     /* eslint-disable react-hooks/exhaustive-deps */
@@ -52,7 +52,7 @@ export default function DiscordLoginButton(props) {
             </g>
         </svg>
     
-        <div className='block text-white text-sm my-auto px-2'>Log In with Discord</div>
+        <div className='block text-white text-sm my-auto px-2'>Sign Up with Discord</div>
         </div>
     </button>
             )

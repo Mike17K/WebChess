@@ -2,8 +2,24 @@ Test if
 
 - change the buttons of login provider to work with the new register page by passing new url for each button to the rerver
 
+- fix register buttons redirect uris
+
 - refresh tokens
 
 - register auth buttons
 
 - tokens timeout ttl
+
+- add scope to access tokens
+
+- care about connection timeout issue in production
+
+- secure passwords for customform and update regex test to include spesial chars
+
+- when token not confirmed handle it in frontend...
+
+
+
+- socket io for messaging system - running on another server not express but http
+- highlight.io for highlighting code in any language and style super easy
+- react paypal js later for payments

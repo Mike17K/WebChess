@@ -1,9 +1,9 @@
 import React from "react";
-import GoogleLoginButton from "../../components/GoogleLoginButton/GoogleLoginButton";
-import DiscordLoginButton from "../../components/DiscordLoginButton/DiscordLoginButton";
-import GithubLoginButton from "../../components/GithubLoginButton/GithubLoginButton";
+import GoogleRegisterButton from "../../components/AuthButtons/GoogleButton/GoogleRegisterButton";
+import DiscordRegisterButton from "../../components/AuthButtons/DiscordButton/DiscordRegisterButton";
+import GithubRegisterButton from "../../components/AuthButtons/GithubButton/GithubRegisterButton";
 
-import outerRegisterProvider from "../../hooks/outerRegisterProvider/outerRegisterProvider";
+import outerRegisterProvider from "../../hooks/outerProvider/outerRegisterProvider";
 
 export default function LoginPage(props) {
   const [createUserCallback] = outerRegisterProvider({
@@ -106,9 +106,9 @@ export default function LoginPage(props) {
           <div className="my-4 h-1 w-3/5 border-t border-gray-300"></div>
 
           <div className="my-2 flex flex-col gap-2">
-            <GoogleLoginButton />
-            <DiscordLoginButton />
-            <GithubLoginButton />
+          <GoogleRegisterButton />
+          <DiscordRegisterButton />
+          <GithubRegisterButton />
           </div>
         </div>
       </section>

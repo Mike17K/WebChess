@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react'
-import credentials from "../../credentials.json"
-import './GoogleLoginButton.css';
-import outerLoginProvider from '../../hooks/outerLoginProvider/outerLoginProvider';
+import credentials from "../../../credentials.json"
+import './GoogleButton.css';
+import outerRegisterProvider from "../../../hooks/outerProvider/outerLoginProvider";
 
 /* global google */
 export default function GoogleLoginButton(props) {    
    
-    const [profile,signOut,getProfileCallback] = outerLoginProvider({provider:"Google"})
-    console.log("GoogleLoginButton profile: ",profile)
+    const [profile,signOut,createUserCallback] = outerRegisterProvider({provider:"Google"})
 
     // handle sign out
     function handleSignOut(event) {
@@ -19,7 +18,7 @@ export default function GoogleLoginButton(props) {
 
     // get the access tocken from server
     async function getServerAccessTockenCallback(response) {
-        getProfileCallback({code:response.credential})
+        createUserCallback({code:response.credential})
         };
 
     useEffect(() => {

@@ -1,8 +1,26 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient(
+  {
+   // log: ['query', 'info', 'warn'],
+   
+  }
+);
+
 prisma.$connect()
 
+
+
+export async function removeExpiredTokensFromDb() {
+  const result = await prisma.accessToken.deleteMany({
+    where: {
+      expired: {
+        lt: new Date(),
+      },
+    },
+  });
+  return result;
+}
 
 
 export async function profileTokenValidation({ profileId, token }) {
@@ -11,7 +29,14 @@ export async function profileTokenValidation({ profileId, token }) {
     include: { accessTokens: { where: { token: token } } },
   });
 
-  return user !== null;
+  if(user === null) return false;
+  // check if token is expired
+  const tokenExpired = user.accessTokens[0].expired;
+  const now = new Date();
+  if (tokenExpired < now) {
+    return false;
+  }
+  return true;
 }
 
 export async function getProfile({ profileId, userMode }) {

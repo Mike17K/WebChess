@@ -8,6 +8,9 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
+import { removeExpiredTokensFromDb } from './api/usersApi.js';
+setInterval(removeExpiredTokensFromDb, 1000 * 60 * 60 * 24); // 24 hours
+
 const app = express();
 
 // Enable CORS for all routes

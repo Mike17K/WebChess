@@ -2,9 +2,9 @@ import React from 'react'
 import {store} from "../../redux/store"
 
 
-const updateProfile = (data) => store.dispatch({type:"setProfile",profile:data})
+const updateProfile = (data) => store.dispatch({type:"updateProfile",profile:data}) 
 const clearProfile = (data) => store.dispatch({type:"clearProfile",profile:data})
-const setProfile = (data) => store.dispatch({type:"setProfile",profile:data})
+//const setProfile = (data) => store.dispatch({type:"setProfile",profile:data})
 
 // This component is used to handle the login and logout process for all the auth providers
 export default function outerLoginProvider(props) {
@@ -31,7 +31,7 @@ export default function outerLoginProvider(props) {
                     return;
                 } 
                 callback();
-                props.clearProfile();
+                clearProfile();
                 console.log("Logged out")
             }).catch(err=> {
                 console.log("Logout error: ",err)
@@ -68,7 +68,7 @@ export default function outerLoginProvider(props) {
             }
         }).then(data => data.json()).then(profile =>{
             // got the profile data from server
-            setProfile(profile);
+            updateProfile(profile);
             callback(profile);
         }).catch(err=> {
             console.log(err)
