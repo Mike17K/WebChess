@@ -30,6 +30,10 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
+  socket.on('mousedown', (e) => {
+    console.log('user mousedown: ',e.profileId);
+    socket.broadcast.emit('mousedown', {profileId:e.profileId,data:e.data});
+  });
 });
 
 export default io;

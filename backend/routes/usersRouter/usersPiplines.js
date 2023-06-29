@@ -272,7 +272,7 @@ export const getTokenPipe = [checkTokenWithProvider, generateToken];
 async function customFormHandlerRegister(req, res, next) {
     let name;
     let password;
-
+    console.log("ok");
     try {
         name = req.body.name;
         password = req.body.password;
@@ -313,7 +313,7 @@ async function customFormHandlerRegister(req, res, next) {
     if (!newUser) return res.sendStatus(500);
     if (!newProfile) return res.sendStatus(500);
 
-    res.redirect(307, '/login');
+    res.redirect(307, 'http:localhost:3000/login');
 }
 
 function createUserFromProviderRegister(req, res, next) {

@@ -6,9 +6,9 @@ import GithubRegisterButton from "../../components/AuthButtons/GithubButton/Gith
 import outerRegisterProvider from "../../hooks/outerProvider/outerRegisterProvider";
 
 export default function LoginPage(props) {
-  const [createUserCallback] = outerRegisterProvider({
+  const createUserCallback = outerRegisterProvider({
     provider: "CustomForm",
-  });
+  })[2];
 
   function onSubmitHandle(e) {
     e.preventDefault();
