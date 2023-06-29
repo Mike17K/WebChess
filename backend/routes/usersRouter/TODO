@@ -18,6 +18,8 @@ Test if
 
 - when token not confirmed handle it in frontend...
 
+- fix socket system for validating access
+
 
 
 - socket io for messaging system - running on another server not express but http

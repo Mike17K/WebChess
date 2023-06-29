@@ -4,7 +4,7 @@ import DiscordLoginButton from "../../components/AuthButtons/DiscordButton/Disco
 import GithubLoginButton from "../../components/AuthButtons/GithubButton/GithubLoginButton";
 
 import outerLoginProvider from "../../hooks/outerProvider/outerLoginProvider";
-0
+
 export default function LoginPage(props) {
   const getProfileCallback = outerLoginProvider({
     provider: "CustomForm",

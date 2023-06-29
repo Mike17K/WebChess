@@ -1,4 +1,3 @@
-import React from 'react';
 import {store} from "../../redux/store"
 
 //const updateProfile = (data) => store.dispatch({type:"updateProfile",profile:data}) 
