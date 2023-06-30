@@ -3,7 +3,6 @@ import { fenToBoard, showBoard } from '../HelperFunctions/index.js';
 const sqName = (id) =>{return `${['a','b','c','d','e','f','g','h'][id%8]}${Math.floor(id/8)+1}`;}; // input 0 output "a1"
 const sqId = (name) =>{return ['a','b','c','d','e','f','g','h'].indexOf(name[0])*8+parseInt(name[1])-1;}; // input "a1" output 0
 
-// TODO fix the boundaries isues !!
 // TODO fix the check !!
 
 // posible moves semi-legal
@@ -27,12 +26,14 @@ function generateMoves_Pawn(piecePos,board,fen){
             moves.push(piecePos+directions[0]);
         }
     }
-    if(board[piecePos+directions[2]] !== ''){
+    // captures left
+    if(board[piecePos+directions[2]] !== '' && piecePos%8 != 0 ){
         if(board[piecePos+directions[2]][0] !== pieceColor){
             moves.push(piecePos+directions[2]);
         }
     }
-    if(board[piecePos+directions[3]] !== ''){
+    // captures right
+    if(board[piecePos+directions[3]] !== '' && piecePos%8 != 7 ){
         if(board[piecePos+directions[3]][0] !== pieceColor){
             moves.push(piecePos+directions[3]);
         }
@@ -58,6 +59,7 @@ function generateMoves_Knight(piecePos,board){
     const directions = [-17,-15,-10,-6,6,10,15,17];
     for(let i = 0; i < directions.length; i++){
         const targetPos = piecePos + directions[i];
+        if (Math.abs(targetPos%8 - piecePos%8)>2) continue; // border limits
         if(targetPos < 0 || targetPos > 63) continue;
         if(board[targetPos] === '') moves.push(targetPos);
         else if(board[targetPos][0] !== board[piecePos][0]) moves.push(targetPos);
@@ -70,15 +72,17 @@ function generateMoves_Bishop(piecePos,board){
     const moves = [];
     const directions = [-9,-7,7,9];
     for(let i = 0; i < directions.length; i++){
-        let targetPos = piecePos + directions[i];
+        let targetPos = piecePos;
         while(targetPos >= 0 && targetPos <= 63){
+            if (Math.abs(targetPos%8 - (targetPos+directions[i])%8)>1) break; // border limits
+            targetPos += directions[i];
+            if (targetPos < 0 || targetPos > 63) break; // border limits
             if(board[targetPos] === '') moves.push(targetPos);
             else if(board[targetPos][0] !== board[piecePos][0]){
                 moves.push(targetPos);
                 break;
             }
             else break;
-            targetPos += directions[i];
         }
     }
    return moves;
@@ -89,15 +93,17 @@ function generateMoves_Rook(piecePos,board){
     const moves = [];
     const directions = [-8,-1,1,8];
     for(let i = 0; i < directions.length; i++){
-        let targetPos = piecePos + directions[i];
+        let targetPos = piecePos;
         while(targetPos >= 0 && targetPos <= 63){
+            if (Math.abs(targetPos%8 - (targetPos+directions[i])%8)>1) break; // border limits
+            targetPos += directions[i];
+            if (targetPos < 0 || targetPos > 63) break; // border limits
             if(board[targetPos] === '') moves.push(targetPos);
             else if(board[targetPos][0] !== board[piecePos][0]){
                 moves.push(targetPos);
                 break;
             }
             else break;
-            targetPos += directions[i];
         }
     }
     return moves;
@@ -116,6 +122,7 @@ function generateMoves_King(piecePos,board,fen){
     const moves = [];
     const directions = [-9,-8,-7,-1,1,7,8,9];
     for(let i = 0; i < directions.length; i++){
+        if (Math.abs(piecePos%8 - (piecePos+directions[i])%8)>1) break; // border limits
         const targetPos = piecePos + directions[i];
         if(targetPos < 0 || targetPos > 63) continue;
         if(board[targetPos] === '') moves.push(targetPos);

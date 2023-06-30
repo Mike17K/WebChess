@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { store } from "../../redux/store";
 
+import './GamePage.css';
+
 // socket logic 
 import { io } from 'socket.io-client';
 const URL = 'http://localhost:5050';
@@ -39,6 +41,18 @@ export default function GamePage() {
     }
     socket.on('mousedown', (data) => {
         console.log('mousedown', data);
+        // draw a circle on the screen
+        const circle = document.createElement('div');
+        circle.classList.add(`${Math.random()}`);
+        circle.classList.add('circle');
+        circle.style.left = data.data.x + 'px';
+        circle.style.top = data.data.y + 'px';
+        document.body.appendChild(circle);
+        setTimeout(() => {
+            circle.remove();
+        }
+        , 500);
+
     });
 
     socket.on('connect', () => {
