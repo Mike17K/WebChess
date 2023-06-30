@@ -1,6 +1,7 @@
 import express from 'express';
 
-import {routerUsers} from './usersRouter/usersRouter.js';
+import {routerUsers} from './routerUsers/routerUsers.js';
+import {routerGames} from './routerGames/routerGames.js';
 
 export const router = express.Router(); // main router
 const routerTactics = express.Router(); // all routes about tactics page
@@ -10,13 +11,10 @@ const Api = await import('../api/api.js');
 
 // main api route
 router.use('/api/users', routerUsers);
-
 router.use('/api/tactic', routerTactics);
+router.use('/api/game', routerGames);
 
 
-// {logged in}
-// /api/game/newGame -> returns secret code that is stored from client and when he calls /api/newGame/addMove sends this key for knowing in what game you are refering to
-// /api/game/addMove
 
 // 
 // /api/game/:gameid -> returns the game requested in the desired format (TODO think about the format)

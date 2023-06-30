@@ -313,7 +313,7 @@ async function customFormHandlerRegister(req, res, next) {
     if (!newUser) return res.sendStatus(500);
     if (!newProfile) return res.sendStatus(500);
 
-    res.redirect(307, 'http:localhost:3000/login');
+    res.sendStatus(200);
 }
 
 function createUserFromProviderRegister(req, res, next) {

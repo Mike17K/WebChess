@@ -5,12 +5,14 @@ import AdminPage from "./pages/AdminPage/AdminPage.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage/RegisterPage.jsx";
 import GamePage from "./pages/GamePage/GamePage.jsx";
+import HomePage from "./pages/HomePage/HomePage.jsx";
 
 function App(props) {
   return (
     <>
       <BrowserRouter basename="/">
         <Routes>
+          <Route path="/" element={<HomePage />} />
           <Route path="/tactics" element={<TacticsPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/login" element={<LoginPage />} />

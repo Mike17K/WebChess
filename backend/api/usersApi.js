@@ -24,6 +24,7 @@ export async function removeExpiredTokensFromDb() {
 
 
 export async function profileTokenValidation({ profileId, token }) {
+  console.log(profileId, token);
   const user = await findUser({
     where: { id: profileId },
     include: { accessTokens: { where: { token: token } } },

@@ -34,6 +34,8 @@ model User {
 
   completedTactics Tactic[]
   accessTokens Token[]
+  gamesPlayedAsWhite ChessGame[] @relation("PlayerWhite")
+  gamesPlayedAsBlack ChessGame[] @relation("PlayerBlack")
 }
 
 model Profile {
@@ -95,4 +97,29 @@ model Tactic {
   deletedAt DateTime?
 
   completedBy User[]
+}
+
+model ChessGame {
+  id       String     @id @default(uuid())
+  playerWhiteId String?
+  playerWhite  User?       @relation("PlayerWhite", fields: [playerWhiteId], references: [id])
+  playerBlackId String?
+  playerBlack  User?      @relation("PlayerBlack", fields: [playerBlackId], references: [id])
+
+whitePlayerTime Int
+blackPlayerTime Int
+
+  status    String
+  result    String?
+  
+  pgn       String?
+
+  metadata  Json?
+  
+  startTime DateTime
+  endTime   DateTime?
+
+  accessKey String // used to access the game for interactive spectators and players
+  // if the user has the accessKey if the user id is playerWhiteId or playerBlackId, the user is a player, otherwise is an interactive spectator 
+  // else is a passive spectator
 }

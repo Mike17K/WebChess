@@ -20,8 +20,8 @@ export default function outerRegisterProvider(props) {
                 "provider": props.provider
             })
         }).then(response => {
-            if(response.redirected) {
-                window.location.href = response.url;
+            if(response.ok) {
+                window.location.href = 'http://localhost:3000/login';
             }
         }).catch(err => {
             console.log(err)

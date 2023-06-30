@@ -121,10 +121,12 @@ export function Square({ id, pos, state, setState, whiteSide, highLightedColor }
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          userId: "SOME_ID", // from redux TODO
           gameId: gameId,
           sqIDFrom:selectedId, // sumbit the id of the square in witch the piece was
           sqIDTo:id, // sumbit the id of the square in witch the piece is going
-          accessToken:"SOME_TOKEN"
+          accessToken:"SOME_TOKEN" ,// for the game TODO
+          accessServerKey:"SOME_TOKEN" // for the server from redux TODO
         }) // TODO make the server sent it for each individual game based on time and user
     }).then((res) => res.json()).then((data) => {
       setState({
