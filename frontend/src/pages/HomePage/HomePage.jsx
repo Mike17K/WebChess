@@ -1,6 +1,9 @@
 import React from 'react'
 import {store} from "../../redux/store"
 
+const setAccessGame = (data) => store.dispatch({type:"setAccessGame",accessGame:{key:data.key,url:data.url}})
+// const clearAccessGame = (data) => store.dispatch({type:"clearAccessGame"})
+
 export default function HomePage() {
 
     function newGameHandle(){
@@ -21,9 +24,13 @@ export default function HomePage() {
           }
           console.log(data);
           const {url , accessKey } = data;
-          console.log("SUCCESS: ",url, accessKey);
-          // TODO store the accessKey in the redux store for this game url
-          // TODO redirect to the game page
+
+          // store the accessKey in the redux store for this game url
+          setAccessGame({key:accessKey,url:url});
+
+          // redirect to the game page
+          window.location.href = url;
+          
         }).catch((error) => {
           console.error('Error:', error);
         });
@@ -34,6 +41,7 @@ export default function HomePage() {
     <div>HomePage</div>
 
     <button onClick={newGameHandle}>Play New Game</button>
+    <button onClick={newGameHandle}>Join Game</button>
     </>
   )
 }
