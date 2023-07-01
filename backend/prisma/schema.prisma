@@ -47,6 +47,7 @@ model Profile {
   bio     String?
 
   score Int @default(0)
+  rating Int @default(0)
 
   user User @relation(fields: [userid], references: [id])
   userid String @unique
@@ -113,6 +114,7 @@ blackPlayerTime Int
   result    String?
   
   pgn       String?
+  fen       String @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
   metadata  Json?
   

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './Square.css'
-
+import {store} from '../../../../redux/store';
 /*
 function onDownLeftClickHandler(state,setState,pos){
 
@@ -113,7 +113,22 @@ export function Square({ id, pos, state, setState, whiteSide, highLightedColor }
       // move the piece
       const selectedId = {a:0,b:1,c:2,d:3,e:4,f:5,g:6,h:7}[state.selected[0]] + (parseInt(state.selected[1])-1)*8;
       // send the move to the server
-      const gameId = "123456789";
+      let gameId;
+      let accessToken;
+      let userId;
+      let accessServerKey;
+      try{
+        const state = store.getState();
+        userId = state.profile.profile.id;
+        gameId = state.games.accessGame.id;
+        accessToken = state.games.accessGame.key;
+        accessServerKey = state.profile.profile.access_server_key;
+        console.log(userId,gameId,accessToken,accessServerKey);
+      }catch(err){
+        console.log(err);
+        return;
+      }
+
       // submit a move to the server
       fetch(`http://localhost:5050/api/game/addMove`, {
         method: "POST",
@@ -121,14 +136,15 @@ export function Square({ id, pos, state, setState, whiteSide, highLightedColor }
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: "SOME_ID", // from redux TODO
+          userId: userId, // from redux
           gameId: gameId,
           sqIDFrom:selectedId, // sumbit the id of the square in witch the piece was
           sqIDTo:id, // sumbit the id of the square in witch the piece is going
-          accessToken:"SOME_TOKEN" ,// for the game TODO
-          accessServerKey:"SOME_TOKEN" // for the server from redux TODO
+          accessToken:accessToken , // for the game from redux 
+          accessServerKey:accessServerKey // for the server from redux 
         }) // TODO make the server sent it for each individual game based on time and user
     }).then((res) => res.json()).then((data) => {
+      // res: board, whiteIsPlaying, leagalMoves
       setState({
         board: data.board,
         selected: null, 

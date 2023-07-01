@@ -1,16 +1,32 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { store } from "../../redux/store";
 
 import './GamePage.css';
+import ChessBoard from "../../components/ChessBoard/ChessBoard";
 
 // socket logic 
 import { io } from 'socket.io-client';
 const URL = 'http://localhost:5050';
 
+const initDataState = {
+  fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  title: "Init"
+};
+
 export default function GamePage() {
   const { chessgameid } = useParams();
   const profile = store.getState().profile.profile;
+
+  const [data, setData] = useState(initDataState);
+  const [whiteSide, setWhiteSide] = useState(true);
+
+  useEffect(() => {
+    fetch(`http://localhost:5050/api/game/getChessGame/${chessgameid}`,
+     { method: "GET" }
+     ).then((res) => res.json()).then((chessgame) => {setData(chessgame)
+    console.log(chessgame)}).catch((err) => console.log(err));
+  }, [chessgameid]);
 
   useEffect(() => {
     const socket = io(URL, {
@@ -76,6 +92,9 @@ export default function GamePage() {
     <>
       <div>GamePage</div>
       {chessgameid}
+      <ChessBoard fen={data.fen} whiteSide={whiteSide} />
+      <button onClick={(e)=>{setWhiteSide(!whiteSide)}}>Rotate</button>
+
     </>
   );
 }

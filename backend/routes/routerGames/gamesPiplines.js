@@ -23,10 +23,10 @@ async function createNewGame(req, res, next) {
     if (!isValid) return res.status(401).send({ error: 'Invalid profileId or accessServerKey' });
 
     // create new game
-    const { url , accessKey } = await gamesApi.createNewGame({ profileId:profileId });
+    const { url , accessKey, id } = await gamesApi.createNewGame({ profileId:profileId });
 
     // return url and accessKey
-    return res.status(200).send({ url, accessKey });
+    return res.status(200).send({ url, accessKey,id });
 }
 
 
@@ -43,6 +43,7 @@ async function validatePlayer(req, res, next) {
     let isValid = await usersApi.profileTokenValidation({ profileId: userId, token: accessServerKey })
     if (!isValid) return res.status(401).send({ error: 'Invalid profileId or accessServerKey' });
 
+    /* these checks are beeing done in addMove
     // check if accessToken is valid for this game
     isValid = await gamesApi.validateAccessToken({ accessKey:accessToken, gameId:gameId });
     if (!isValid) return res.status(401).send({ error: 'Invalid accessToken' });
@@ -50,7 +51,7 @@ async function validatePlayer(req, res, next) {
     // check if userId is valid for this game
     isValid = await gamesApi.validatePlayerId({ userId:userId, gameId:gameId });
     if (!isValid) return res.status(401).send({ error: 'Invalid userId' });
-
+    */
     next()
     return;
 }
@@ -58,9 +59,13 @@ async function validatePlayer(req, res, next) {
 async function addMove(req, res, next) {
     const { userId, gameId, sqIDFrom, sqIDTo, accessToken } = req.body;
     // update the pgn for this game TODO
+    const chessGame = await gamesApi.addMove({ userId:userId,gameId:gameId, sqIDFrom:sqIDFrom, sqIDTo:sqIDTo, accessToken:accessToken });
+
+    // frontend expexts this response TODO
+    // res: board, whiteIsPlaying, leagalMoves
 
     // update the fen for this game TODO
-    return res.status(200);
+    return res.json({board:chessGame.fen, whiteIsPlaying:chessGame.whiteIsPlaying, leagalMoves:chessGame.leagalMoves});
 }
 
 export const addMovePipe = [validatePlayer,addMove];
@@ -72,6 +77,7 @@ export const addMovePipe = [validatePlayer,addMove];
 async function getChessGame(req, res, next) {
     const chessGameId = req.params.id;
     const chessGame = await gamesApi.getChessGame({ chessGameId });
-    return res.status(200).send(chessGame);
+    console.log("getChessGame res: ",chessGame);
+    return res.json(chessGame);
 }
 export const getChessGamePipe = [getChessGame];

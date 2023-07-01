@@ -1,7 +1,7 @@
 import React from 'react'
 import {store} from "../../redux/store"
 
-const setAccessGame = (data) => store.dispatch({type:"setAccessGame",accessGame:{key:data.key,url:data.url}})
+const setAccessGame = (data) => store.dispatch({type:"setAccessGame",accessGame:{id:data.id,key:data.key,url:data.url}})
 // const clearAccessGame = (data) => store.dispatch({type:"clearAccessGame"})
 
 export default function HomePage() {
@@ -23,10 +23,10 @@ export default function HomePage() {
             return;
           }
           console.log(data);
-          const {url , accessKey } = data;
+          const {url , accessKey, id } = data;
 
           // store the accessKey in the redux store for this game url
-          setAccessGame({key:accessKey,url:url});
+          setAccessGame({key:accessKey,url:url,id:id});
 
           // redirect to the game page
           window.location.href = url;
