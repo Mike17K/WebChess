@@ -1,6 +1,9 @@
 const usersApi = await import('../../api/usersApi.js');
 const gamesApi = await import('../../api/gamesApi.js');
 
+const simpleEngine = await import('../../controllers/simpleEngineController.js');
+import { fenToBoard} from '../../HelperFunctions/index.js';
+
 ////////////////////////////////
 //         newGamePipe        //
 ////////////////////////////////
@@ -59,13 +62,16 @@ async function validatePlayer(req, res, next) {
 async function addMove(req, res, next) {
     const { userId, gameId, sqIDFrom, sqIDTo, accessToken } = req.body;
     // update the pgn for this game TODO
-    const chessGame = await gamesApi.addMove({ userId:userId,gameId:gameId, sqIDFrom:sqIDFrom, sqIDTo:sqIDTo, accessToken:accessToken });
+    const { fen } = await gamesApi.addMove({ userId:userId,gameId:gameId, sqIDFrom:sqIDFrom, sqIDTo:sqIDTo, accessToken:accessToken });
 
-    // frontend expexts this response TODO
     // res: board, whiteIsPlaying, leagalMoves
-
+    console.log("addMove res: ",fen);
+    
+    
+    const leagalMoves = await simpleEngine.getLeagalMoves(fen);
+    const board = fenToBoard(fen);
     // update the fen for this game TODO
-    return res.json({board:chessGame.fen, whiteIsPlaying:chessGame.whiteIsPlaying, leagalMoves:chessGame.leagalMoves});
+    return res.json({board:board, whiteIsPlaying:fen.split(' ')[1] === 'w', leagalMoves:leagalMoves});
 }
 
 export const addMovePipe = [validatePlayer,addMove];

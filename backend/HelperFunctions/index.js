@@ -47,6 +47,38 @@ export function fenToBoard(fen) {
     return board;
 }
 
+export function boardToFen(board, turn, castling, enPassant, halfMoveClock, fullMoveNumber) { 
+    // This function converts a board array to a fen string
+    const pieces = {bP:"p", bN:"n", bB:"b", bR:"r", bQ:"q", bK:"k", wP:"P", wN:"N", wB:"B", wR:"R", wQ:"Q", wK:"K"};
+    let fen = "";
+    let empty = 0;
+    for(let i = 7; i>=0; i--) {
+        for(let j = 0; j <8; j++) {
+            if(board[i*8+j]==="") empty++;
+            else{
+                if(empty>0) fen += empty;
+                fen += pieces[board[i*8+j]];
+                empty = 0;
+            }
+        }
+        if(empty>0) fen += empty;
+        empty = 0;
+        if(i>0) fen += "/";
+    }
+    fen += " ";
+    fen += turn;
+    fen += " ";
+    fen += castling;
+    fen += " ";
+    fen += enPassant;
+    fen += " ";
+    fen += halfMoveClock;
+    fen += " ";
+    fen += fullMoveNumber;
+    return fen;
+}
+
+
 export function showBoard(board){
     // This function prints the board in the console
     let str = "";

@@ -1,4 +1,4 @@
-import { fenToBoard, showBoard } from '../HelperFunctions/index.js';
+import { fenToBoard, boardToFen,showBoard } from '../HelperFunctions/index.js';
 
 const sqName = (id) =>{return `${['a','b','c','d','e','f','g','h'][id%8]}${Math.floor(id/8)+1}`;}; // input 0 output "a1"
 const sqId = (name) =>{return ['a','b','c','d','e','f','g','h'].indexOf(name[0])*8+parseInt(name[1])-1;}; // input "a1" output 0
@@ -205,4 +205,15 @@ export async function getLeagalMoves(fen) {
 
 export async function getEvaluation(fen) {
     return 1; //TODO implementation
+}
+
+export function move(fen,sqIDFrom,sqIDTo){ // FIX TODO
+    const board = fenToBoard(fen);
+    const piece = board[sqIDFrom];
+    board[sqIDFrom] = '';
+    board[sqIDTo] = piece;
+
+    //boardToFen(board, turn, castling, enPassant, halfMoveClock, fullMoveNumber)
+    const newfen = boardToFen(board, fen.split(' ')[1]==="w"?"b":"w", fen.split(' ')[2], fen.split(' ')[3], fen.split(' ')[4], fen.split(' ')[5]);
+    return {fen:newfen}; //TODO implementation
 }

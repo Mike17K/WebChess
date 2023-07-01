@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 
+const simpleEngine = await import('../controllers/simpleEngineController.js');
+
 const prisma = new PrismaClient(
   {
    // log: ['query', 'info', 'warn'],
@@ -102,8 +104,10 @@ export async function addMove({ userId,gameId, sqIDFrom, sqIDTo, accessToken }) 
     if(chessGame.accessKey !== accessToken) return 400;
     if(chessGame.playerWhiteId === userId || chessGame.playerBlackId === userId){
         // get fen and send the move to the engine with sqIDFrom and sqIDTo TODO
-        const fen = chessGame.fen;
-        console.log("update fen");
+
+        const {fen} = simpleEngine.move(chessGame.fen,sqIDFrom,sqIDTo);
+
+        // TODO update database
         // it will return the fen after the move TODO
         
         // update the fen for this game TODO
@@ -112,8 +116,8 @@ export async function addMove({ userId,gameId, sqIDFrom, sqIDTo, accessToken }) 
         //     where: { id: gameId },
         //     data: { pgn: chessGame.pgn + ' ' + sqIDFrom + sqIDTo },
         //   })
-        // update the fen for this game TODO
-        return chessGame;
+        
+        return { fen:fen };
     }
     return 400;
 }
