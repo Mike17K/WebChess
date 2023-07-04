@@ -20,6 +20,7 @@ export function validateObj(obj, fields = []) {
 // TODO board to fen
 
 export function fenToBoard(fen) {
+    try {
     // This function converts a fen string to a board array
     const pieces = {p:"bP", n:"bN", b:"bB", r:"bR", q:"bQ", k:"bK", P:"wP", N:"wN", B:"wB", R:"wR", Q:"wQ", K:"wK"};
     const board = [];
@@ -45,6 +46,10 @@ export function fenToBoard(fen) {
         }
     }
     return board;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
 }
 
 export function boardToFen(board, turn, castling, enPassant, halfMoveClock, fullMoveNumber) { 

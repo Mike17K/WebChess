@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import credentials from "../../../credentials.json"
 import './GoogleButton.css';
-import outerRegisterProvider from "../../../hooks/outerProvider/outerLoginProvider";
+import outerRegisterProvider from "../../../hooks/outerProvider/outerRegisterProvider";
 
 /* global google */
 export default function GoogleLoginButton(props) {    

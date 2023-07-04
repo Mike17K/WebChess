@@ -8,6 +8,7 @@ export default function GoogleLoginButton(props) {
    
     const [profile,signOut,getProfileCallback] = outerLoginProvider({provider:"Google"})
 
+    
     // handle sign out
     function handleSignOut(event) {
         event.preventDefault()
@@ -15,18 +16,18 @@ export default function GoogleLoginButton(props) {
         google.accounts.id.revoke(localStorage.getItem("googleToken"));
         signOut();
     }    
-
+    
     // get the access tocken from server
     async function getServerAccessTockenCallback(response) {
         getProfileCallback({code:response.credential})
-        };
-
+    };
+    
     useEffect(() => {
         if(credentials.GOOGLE_CLIENT_ID === undefined) {
             console.error("Google Client ID is undefined in the /src/credentials.json file")
             return
         }
-
+        
         google.accounts.id.initialize({
             client_id: credentials.GOOGLE_CLIENT_ID,
             callback: getServerAccessTockenCallback,
@@ -42,19 +43,23 @@ export default function GoogleLoginButton(props) {
                 shape: "rectangular",
                 width: "long"
             }
-        )
-
-        //google.accounts.id.prompt();
-    /* eslint-disable react-hooks/exhaustive-deps */
+            )
+            
+            //google.accounts.id.prompt();
+            /* eslint-disable react-hooks/exhaustive-deps */
     }, [])
-
-  return (
-    <>
+    
+    if(google === undefined) {
+        // rerender the component if google is not defined ???????
+        return <GoogleLoginButton {...props} />
+    }
+    return (
+        <>
         {
-        profile.authProvider === "Google" && (
-            <div onClick={handleSignOut}
-            className='logout-button rounded relative'
-            >
+            profile.authProvider === "Google" && (
+                <div onClick={handleSignOut}
+                className='logout-button rounded relative'
+                >
                 <img src={`${profile.picture}`} alt="profile img" />
                 <div className='flex text-white '>
                     <div className='flex flex-col text-white'>

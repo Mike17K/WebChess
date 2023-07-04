@@ -9,7 +9,6 @@ const sqId = (name) =>{return ['a','b','c','d','e','f','g','h'].indexOf(name[0])
 function generateMoves_Pawn(piecePos,board,fen){
     // piecePos = 0-63
     // board = array of 64 chars
-    
     const pieceColor = board[piecePos][0];
     const moves = [];
     const directions = pieceColor === 'w' ? [8,16,7,9] : [-8,-16,-9,-7]; // fowrward, double forward, diagonal left, diagonal right
@@ -180,7 +179,7 @@ function generateMoves(pieceType, piecePos,board,fen){
     return []; // returns array
 }    
 
-export async function getLeagalMoves(fen) {
+export function getLeagalMoves(fen) {
     // res {
     //  piecePos: [targetsPos]   
     // }
@@ -209,11 +208,39 @@ export async function getEvaluation(fen) {
 
 export function move(fen,sqIDFrom,sqIDTo){ // FIX TODO
     const board = fenToBoard(fen);
+    if(!board) return {error:"No fen correct"};
     const piece = board[sqIDFrom];
+    if(!piece) return {error:"No piece on sqIDFrom"};
+    if(piece[0] !== fen.split(' ')[1]) return {error:"Wrong color to move"};
+
+    // if pawn 2 forward set enpassant sq
+    if(piece[1].toUpperCase() === 'P' && Math.abs(sqIDFrom-sqIDTo) === 16){
+        const enPassant = sqName((sqIDFrom+sqIDTo)/2);
+        board[sqIDFrom] = '';
+        board[sqIDTo] = piece;
+        const newfen = boardToFen(board, fen.split(' ')[1]==="w"?"b":"w", fen.split(' ')[2], enPassant, fen.split(' ')[4], fen.split(' ')[5]);
+        return {fen:newfen}; 
+    }
+    
+    // handle unpassant move
+    if(piece[1].toUpperCase() === 'P' && sqIDTo === sqId(fen.split(' ')[3]) && fen.split(' ')[3] !== '-'){
+        board[sqIDFrom] = '';
+        board[sqIDTo] = piece;
+        board[sqId(fen.split(' ')[3])+(piece[0]==="w"?-8:8)] = '';
+        const newfen = boardToFen(board, fen.split(' ')[1]==="w"?"b":"w", fen.split(' ')[2], '-', fen.split(' ')[4], fen.split(' ')[5]);
+        return {fen:newfen}; 
+    }
+    
+    // if rook moves update castling rights TODO
+    // if king moves update castling rights TODO
+    // if rook captured update castling rights TODO
+
+
     board[sqIDFrom] = '';
     board[sqIDTo] = piece;
 
     //boardToFen(board, turn, castling, enPassant, halfMoveClock, fullMoveNumber)
     const newfen = boardToFen(board, fen.split(' ')[1]==="w"?"b":"w", fen.split(' ')[2], fen.split(' ')[3], fen.split(' ')[4], fen.split(' ')[5]);
-    return {fen:newfen}; //TODO implementation
+    
+    return {fen:newfen}; 
 }

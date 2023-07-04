@@ -7,7 +7,7 @@ import queryString from 'query-string';
 
 import './GithubButton.css';
 
-import outerRegisterProvider from "../../../hooks/outerProvider/outerLoginProvider";
+import outerRegisterProvider from "../../../hooks/outerProvider/outerRegisterProvider";
 
 
 export default function GithubRegisterButton(props) {    

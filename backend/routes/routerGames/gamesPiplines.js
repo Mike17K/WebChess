@@ -44,7 +44,10 @@ async function validatePlayer(req, res, next) {
     const { userId,accessServerKey,gameId, accessToken } = req.body;
     // check if accessToken is valid
     let isValid = await usersApi.profileTokenValidation({ profileId: userId, token: accessServerKey })
-    if (!isValid) return res.status(401).send({ error: 'Invalid profileId or accessServerKey' });
+    if (!isValid){
+        console.log("validatePlayer: ",isValid);
+        return res.status(401).send({ error: 'Invalid profileId or accessServerKey' });
+    } 
 
     /* these checks are beeing done in addMove
     // check if accessToken is valid for this game
@@ -62,14 +65,19 @@ async function validatePlayer(req, res, next) {
 async function addMove(req, res, next) {
     const { userId, gameId, sqIDFrom, sqIDTo, accessToken } = req.body;
     // update the pgn for this game TODO
-    const { fen } = await gamesApi.addMove({ userId:userId,gameId:gameId, sqIDFrom:sqIDFrom, sqIDTo:sqIDTo, accessToken:accessToken });
 
+    const response = await gamesApi.addMove({ userId:userId,gameId:gameId, sqIDFrom:sqIDFrom, sqIDTo:sqIDTo, accessToken:accessToken });
+    if(response===400) return res.status(400).send({ error: 'Invalid move' });
+
+    const { fen } = response;
+    if(!fen) return res.status(400).send({ error: 'Invalid move' });
     // res: board, whiteIsPlaying, leagalMoves
-    console.log("addMove res: ",fen);
-    
-    
-    const leagalMoves = await simpleEngine.getLeagalMoves(fen);
+    console.log("fen: ",fen);
+
+    const leagalMoves = simpleEngine.getLeagalMoves(fen);
     const board = fenToBoard(fen);
+    if(!board) return res.status(400).send({ error: 'Invalid fen' });
+
     // update the fen for this game TODO
     return res.json({board:board, whiteIsPlaying:fen.split(' ')[1] === 'w', leagalMoves:leagalMoves});
 }

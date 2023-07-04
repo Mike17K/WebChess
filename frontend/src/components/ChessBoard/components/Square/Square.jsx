@@ -145,6 +145,8 @@ export function Square({ id, pos, state, setState, whiteSide, highLightedColor }
         }) // TODO make the server sent it for each individual game based on time and user
     }).then((res) => res.json()).then((data) => {
       // res: board, whiteIsPlaying, leagalMoves
+      if( data.error || !data) return;
+      
       console.log(data);
       setState({
         board: data.board,

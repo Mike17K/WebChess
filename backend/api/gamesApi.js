@@ -105,17 +105,21 @@ export async function addMove({ userId,gameId, sqIDFrom, sqIDTo, accessToken }) 
     if(chessGame.playerWhiteId === userId || chessGame.playerBlackId === userId){
         // get fen and send the move to the engine with sqIDFrom and sqIDTo TODO
 
-        const {fen} = simpleEngine.move(chessGame.fen,sqIDFrom,sqIDTo);
+        const {fen, error} = simpleEngine.move(chessGame.fen,sqIDFrom,sqIDTo);
+        // console.log("error: ",error);
+        // console.log("fen: ",fen);
 
-        // TODO update database
-        // it will return the fen after the move TODO
-        
-        // update the fen for this game TODO
-        // update the pgn for this game TODO
-        // const res = await prisma.chessGame.update({
-        //     where: { id: gameId },
-        //     data: { pgn: chessGame.pgn + ' ' + sqIDFrom + sqIDTo },
-        //   })
+        if(!fen) return 400;
+
+        // translate the move to pgn TODO
+        // for now the moves will be saved as sqIDFrom + sqIDTo TODO
+        const pgn = chessGame.pgn + ' ' + sqIDFrom + sqIDTo;
+
+        // update the database game with the new fen and pgn
+        const res = await prisma.chessGame.update({
+            where: { id: gameId },
+            data: { pgn: pgn , fen: fen, whitePlayerTime: chessGame.whitePlayerTime, blackPlayerTime: chessGame.blackPlayerTime},
+          })
         
         return { fen:fen };
     }
