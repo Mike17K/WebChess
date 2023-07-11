@@ -1,4 +1,6 @@
 import { Server } from "socket.io";
+import {validateAccessKey} from './routes/routerUsers/usersPiplines.js'
+const gamesApi = await import('./api/gamesApi.js');
 
 const io = new Server({
   cors: {
@@ -9,12 +11,23 @@ const io = new Server({
 // Middleware function to check for access key
 const checkAccessKey = (socket, next) => {
   const { query } = socket.handshake;
-  //console.log(query);
   
   if(query.scope === 'chessgame'){
     const {accessServerKey,profileId,chessGameid,chessGameAccessKey} = query;
-    // If the access key is valid, allow the connection to proceed TODO
-    return next(); 
+    // validate user // TODO propably here no need to check for user if the game is public
+    validateAccessKey(profileId, accessServerKey, async ()=>{
+      console.log("user valid");
+      // chessgame 
+      const isValid = await gamesApi.validateAccessToken({ accessKey:chessGameAccessKey,gameId:chessGameid});
+      
+      // If the access key is valid
+      if(isValid){
+        next();
+      }
+      
+      return  
+    })
+    return 
   }
 
 // If the access key is missing, decline the connection
@@ -26,13 +39,20 @@ io.use(checkAccessKey);
 
 io.on('connection', (socket) => {
   console.log('a user connected');
+  // socket.handshake conains the info about the game and room
+  // the middleware is job is to validate users for each game based on the visibility of the game the want to access
+  socket.join(socket.handshake.query.chessGameid); // join a room of chess
+  const room = socket.to(socket.handshake.query.chessGameid) // not good practice but it has to be for security purpuses for the private rooms if someone changes the socket.chessGameid later when the middleware is not applied
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
+
   socket.on('mousedown', (e) => {
     console.log('user mousedown: ',e.profileId);
-    socket.broadcast.emit('mousedown', {profileId:e.profileId,data:e.data});
+    // !!!
+    // i dont know about security on this method | if the client changes the chessGameid while he has connection he can access diferent rooms without validating
+    room.emit('mousedown', {profileId:e.profileId,data:e.data});
   });
 });
 

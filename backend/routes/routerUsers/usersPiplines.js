@@ -10,7 +10,7 @@ const usersApi = await import('../../api/usersApi.js');
 //      getMyProfilePipe      //
 ////////////////////////////////
 
-async function validateAccessKey(profileId, token, callback) {
+export async function validateAccessKey(profileId, token, callback) {
     if (!profileId) return;
 
     // check if there is this token in the userId

@@ -76,10 +76,15 @@ export async function validateAccessToken({accessKey, gameId}) {
     const chessGame = await prisma.chessGame.findFirst({
         where: {
             id: gameId,
+        },
+        select:{
+          accessKey: true,
+          visibility: true
         }
     });
-
-    if(chessGame.accessKey === accessKey) return true;
+    // handle visibility 
+    if(chessGame.accessKey === accessKey && chessGame.visibility === 'private') return true;
+    if(chessGame.visibility === 'public') return true;
     return false;
 }
 

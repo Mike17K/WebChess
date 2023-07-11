@@ -21,8 +21,8 @@ Test if
 - fix socket system for validating access
 
 
-- corect rooms for sockets
-
+- fix the game move update with sockets 
+- fix move for working only for the players of the game not the others
 
 
 - socket io for messaging system - running on another server not express but http

@@ -51,7 +51,7 @@ export default function GamePage() {
         const data = {x:cursor_x,y:cursor_y};
         // identify the event as reaction
         if (e.ctrlKey && e.which == 1) { //Mouse and control was pressed
-            socket.emit('mousedown', { chessgameid, chessGameAccessKey: 'YOUR_ACCESS_KEY', profileId: profile.id, data:data });
+            socket.emit('mousedown', { chessGameid:chessgameid, chessGameAccessKey: 'YOUR_ACCESS_KEY', profileId: profile.id, data:data });
         }
         // control key 
     }
