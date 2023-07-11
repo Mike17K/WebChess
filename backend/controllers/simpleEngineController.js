@@ -120,8 +120,9 @@ function generateMoves_King(piecePos,board,fen){
     // board = array of 64 chars
     const moves = [];
     const directions = [-9,-8,-7,-1,1,7,8,9];
+    console.log(piecePos);
     for(let i = 0; i < directions.length; i++){
-        if (Math.abs(piecePos%8 - (piecePos+directions[i])%8)>1) break; // border limits
+        if (Math.abs(piecePos%8 - (piecePos+directions[i])%8)>1) continue; // border limits
         const targetPos = piecePos + directions[i];
         if(targetPos < 0 || targetPos > 63) continue;
         if(board[targetPos] === '') moves.push(targetPos);
@@ -130,30 +131,29 @@ function generateMoves_King(piecePos,board,fen){
     // castling
     const castling = fen.split(' ')[2].split('');
     if(board[piecePos][0] === 'w'){
-        if(board[60] === 'wK'){
-            if(board[61] === '' && board[62] === '' && board[63] === 'wR'){
+        if(board[4] === 'wK'){
+            if(board[5] === '' && board[6] === '' && board[7] === 'wR'){
                 if(castling.includes('K')){
-                    moves.push(62);
+                    moves.push(6);
                 }
             }
-            if(board[59] === '' && board[58] === '' && board[57] === '' && board[56] === 'wR'){
+            if(board[3] === '' && board[2] === '' && board[1] === '' && board[0] === 'wR'){
                 if(castling.includes('Q')){
-                    moves.push(58);
+                    moves.push(2);
                 }
-                moves.push(58);
             }
         }
     }
     else{
-        if(board[4] === 'bK'){
-            if(board[5] === '' && board[6] === '' && board[7] === 'bR'){
+        if(board[60] === 'bK'){
+            if(board[61] === '' && board[62] === '' && board[63] === 'bR'){
                 if(castling.includes('k')){
-                    moves.push(6);
+                    moves.push(62);
                 }                
             }
-            if(board[3] === '' && board[2] === '' && board[1] === '' && board[0] === 'bR'){
+            if(board[59] === '' && board[58] === '' && board[57] === '' && board[56] === 'bR'){
                 if(castling.includes('q')){
-                    moves.push(2);
+                    moves.push(58);
                 }
             }
         }
@@ -213,6 +213,15 @@ export function move(fen,sqIDFrom,sqIDTo){ // FIX TODO
     if(!piece) return {error:"No piece on sqIDFrom"};
     if(piece[0] !== fen.split(' ')[1]) return {error:"Wrong color to move"};
 
+    let castling = fen.split(' ')[2].split('');
+    // if rook captured update castling rights TODO
+    if(sqIDTo === 0) castling = castling.filter(e => e !== 'Q');
+    if(sqIDTo === 7) castling = castling.filter(e => e !== 'K');
+    if(sqIDTo === 56) castling = castling.filter(e => e !== 'q');
+    if(sqIDTo === 63) castling = castling.filter(e => e !== 'k');
+
+    // if king captured update castling rights TODO ?? probable mot
+
     // if pawn 2 forward set enpassant sq
     if(piece[1].toUpperCase() === 'P' && Math.abs(sqIDFrom-sqIDTo) === 16){
         const enPassant = sqName((sqIDFrom+sqIDTo)/2);
@@ -231,16 +240,56 @@ export function move(fen,sqIDFrom,sqIDTo){ // FIX TODO
         return {fen:newfen}; 
     }
     
-    // if rook moves update castling rights TODO
-    // if king moves update castling rights TODO
-    // if rook captured update castling rights TODO
+    // if rook moves update castling rights
+    if(piece[1].toUpperCase() === 'R'){
+        board[sqIDFrom] = '';
+        board[sqIDTo] = piece;
+        if(sqIDFrom === 0) castling = castling.filter(c => c !== 'Q');
+        if(sqIDFrom === 7) castling = castling.filter(c => c !== 'K');
+        if(sqIDFrom === 56) castling = castling.filter(c => c !== 'q');
+        if(sqIDFrom === 63) castling = castling.filter(c => c !== 'k');
+        const newfen = boardToFen(board, fen.split(' ')[1]==="w"?"b":"w", castling.join(""), "-", fen.split(' ')[4], fen.split(' ')[5]);
+        return {fen:newfen}; 
+    }
+
+    // if king moves update castling rights
+    // if king moves 2 sq its castles update rook positions
+    if(piece[1].toUpperCase() === 'K'){
+        board[sqIDFrom] = '';
+        board[sqIDTo] = piece;
+        
+        if(sqIDFrom === 4 && sqIDTo === 6)   {
+            castling = castling.filter(c=>!["Q","K"].includes(c)) // white short castle
+            board[5] = board[7];
+            board[7] = '';
+        }
+        if(sqIDFrom === 4 && sqIDTo === 2)   {
+            castling = castling.filter(c=>!["Q","K"].includes(c)) // white long castle
+            board[3] = board[0];
+            board[0] = '';
+        }
+        if(sqIDFrom === 60 && sqIDTo === 62) {
+            castling = castling.filter(c=>!["q","k"].includes(c)) // black short castle
+            board[61] = board[63];
+            board[63] = '';
+        }
+        if(sqIDFrom === 60 && sqIDTo === 58) {
+            castling = castling.filter(c=>!["q","k"].includes(c)) // black long castle
+            board[59] = board[56];
+            board[56] = '';
+        }
+        
+        const newfen = boardToFen(board, fen.split(' ')[1]==="w"?"b":"w", castling.join(""), "-", fen.split(' ')[4], fen.split(' ')[5]);
+        return {fen:newfen}; 
+    }
+
 
 
     board[sqIDFrom] = '';
     board[sqIDTo] = piece;
 
     //boardToFen(board, turn, castling, enPassant, halfMoveClock, fullMoveNumber)
-    const newfen = boardToFen(board, fen.split(' ')[1]==="w"?"b":"w", fen.split(' ')[2], fen.split(' ')[3], fen.split(' ')[4], fen.split(' ')[5]);
+    const newfen = boardToFen(board, fen.split(' ')[1]==="w"?"b":"w", castling.join(""), fen.split(' ')[3], fen.split(' ')[4], fen.split(' ')[5]);
     
     return {fen:newfen}; 
 }

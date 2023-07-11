@@ -46,18 +46,9 @@ async function validatePlayer(req, res, next) {
     let isValid = await usersApi.profileTokenValidation({ profileId: userId, token: accessServerKey })
     if (!isValid){
         console.log("validatePlayer: ",isValid);
-        return res.status(401).send({ error: 'Invalid profileId or accessServerKey' });
+        return res.status(401).send({ error: 'Invalid profileId or accessServerKey', errorCode: 1});
     } 
 
-    /* these checks are beeing done in addMove
-    // check if accessToken is valid for this game
-    isValid = await gamesApi.validateAccessToken({ accessKey:accessToken, gameId:gameId });
-    if (!isValid) return res.status(401).send({ error: 'Invalid accessToken' });
-
-    // check if userId is valid for this game
-    isValid = await gamesApi.validatePlayerId({ userId:userId, gameId:gameId });
-    if (!isValid) return res.status(401).send({ error: 'Invalid userId' });
-    */
     next()
     return;
 }

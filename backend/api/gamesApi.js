@@ -113,7 +113,7 @@ export async function addMove({ userId,gameId, sqIDFrom, sqIDTo, accessToken }) 
 
         // translate the move to pgn TODO
         // for now the moves will be saved as sqIDFrom + sqIDTo TODO
-        const pgn = chessGame.pgn + ' ' + sqIDFrom + sqIDTo;
+        const pgn = chessGame.pgn + ' ' + sqIDFrom +"-"+ sqIDTo;
 
         // update the database game with the new fen and pgn
         const res = await prisma.chessGame.update({
