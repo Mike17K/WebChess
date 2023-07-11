@@ -110,6 +110,8 @@ model ChessGame {
 whitePlayerTime Int
 blackPlayerTime Int
 
+  visibility Visibility @default(public)
+
   status    String
   result    String?
   
@@ -124,4 +126,10 @@ blackPlayerTime Int
   accessKey String // used to access the game for interactive spectators and players
   // if the user has the accessKey if the user id is playerWhiteId or playerBlackId, the user is a player, otherwise is an interactive spectator 
   // else is a passive spectator
+}
+
+enum Visibility {
+  public
+  private
+  friends
 }

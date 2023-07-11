@@ -125,3 +125,15 @@ export async function addMove({ userId,gameId, sqIDFrom, sqIDTo, accessToken }) 
     }
     return 400;
 }
+
+export async function getPublicGames() {
+    const chessGames = await prisma.chessGame.findMany({
+        where: {
+          visibility: 'public',
+        },
+      select: {
+          id: true
+      }
+    });
+    return chessGames;
+}

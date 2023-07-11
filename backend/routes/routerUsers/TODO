@@ -21,6 +21,9 @@ Test if
 - fix socket system for validating access
 
 
+- corect rooms for sockets
+
+
 
 - socket io for messaging system - running on another server not express but http
 - highlight.io for highlighting code in any language and style super easy

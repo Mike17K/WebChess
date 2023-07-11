@@ -1,16 +1,32 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {store} from "../../redux/store"
 
 const setAccessGame = (data) => store.dispatch({type:"setAccessGame",accessGame:{id:data.id,key:data.key,url:data.url}})
 // const clearAccessGame = (data) => store.dispatch({type:"clearAccessGame"})
 
 export default function HomePage() {
+    const [publicGames, setPublicGames] = useState([]);
+
+    useEffect(() => {
+      fetch('http://localhost:5050/api/game/publicGames', {
+        method: 'GET',
+      }).then(response => response.json()).then(data => {
+        if(data.error){
+          console.log(data.error);
+          return;
+        }
+        // data: {id: ... , url: ...}
+        console.log(data);
+        setPublicGames(data.map(c => {return {id: c.id, url: `http://localhost:3000/chessgame/${c.id}`} }));
+      }).catch((error) => {
+        console.error('Error:', error);
+      });
+    },[]);
 
     function newGameHandle(){
       const profile = store.getState().profile.profile;
       console.log(profile);
       if(profile=== undefined) return window.location.href = "http://localhost:3000/login";
-        // TODO request from server the creation of new game
         fetch('http://localhost:5050/api/game/newGame', {
           method: 'GET',
           headers: {
@@ -34,14 +50,29 @@ export default function HomePage() {
         }).catch((error) => {
           console.error('Error:', error);
         });
-
     }
   return (
     <>
     <div>HomePage</div>
 
     <button onClick={newGameHandle}>Play New Game</button>
-    <button onClick={newGameHandle}>Join Game</button>
+
+    <br/>
+    <h2>Join Games</h2>
+    {
+      publicGames.map((game,index) => {
+        return <div key={index}>
+          <div>{game.id}</div>
+          <div>{game.url}</div>
+          <button onClick={() => {
+            // redirect to the game page
+            window.location.href = game.url;
+          }}
+          className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+          >Join Game</button>
+        </div>
+      })
+    }
     </>
   )
 }

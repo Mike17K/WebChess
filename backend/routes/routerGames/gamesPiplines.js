@@ -86,3 +86,15 @@ async function getChessGame(req, res, next) {
     return res.json(chessGame);
 }
 export const getChessGamePipe = [getChessGame];
+
+////////////////////////////////
+//      getPublicGamesPipe    //
+////////////////////////////////
+
+async function getPublicGames(req, res, next) {
+    const publicGames = await gamesApi.getPublicGames();
+    console.log("getPublicGames res: ",publicGames);
+    return res.json(publicGames);
+}
+
+export const getPublicGamesPipe = [getPublicGames];
