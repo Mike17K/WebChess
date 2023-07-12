@@ -23,4 +23,8 @@ GET http://localhost:5050/api/users/login/discord
 
 ###
 GET https://discord.com/api/v10/users/@me
-Authorization: Bearer XitPL1hBOvP8nFScOYNzqrVETpEHQ8
+Authorization: Bearer rTYhM5uIHBuFIzCILApw92CwuQeSwA
+
+###
+GET https://api.github.com/user
+Authorization: Bearer cJDV7403E8f65ymmwoRt52OsmYXkca

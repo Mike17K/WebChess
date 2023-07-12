@@ -129,7 +129,7 @@ async function discordHandler(req, res, next) {
             'Authorization': `Bearer ${code}`
         }
     }).then(response => response.json()).catch(err => console.log(err));
-
+    
     if (response.message === 'Bad credentials') {
         return res.sendStatus(500);
     }
@@ -160,7 +160,6 @@ async function githubHandler(req, res, next) {
     if (response.message === 'Bad credentials') {
         return res.sendStatus(500)
     }
-
     const { name, node_id } = response;
     if (!name || !node_id) return res.sendStatus(500);
 
@@ -297,7 +296,7 @@ async function googleHandlerRegister(req, res, next) {
     if (user) return res.sendStatus(500, "User already exist");
     // create new user
     // create new profile
-
+    
     // TODO same username issue
     console.log("create user: aud: ",aud);
     const newUser = await usersApi.createFullUser({
@@ -314,10 +313,89 @@ async function googleHandlerRegister(req, res, next) {
         }
     }).catch(err => console.log(err));
     
-
+    
     if (!newUser) return res.sendStatus(500);
     
     return res.sendStatus(200);
+}
+
+async function discordHandlerRegister(req, res, next) {    
+    const code = req.body['code'];
+    if (!code) return res.sendStatus(500);
+    // validating the code
+    const response = await fetch(`https://discord.com/api/v10/users/@me`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${code}`
+        }
+    }).then(response => response.json()).catch(err => console.log(err));
+    
+    if (response.message === 'Bad credentials') {
+        return res.sendStatus(500);
+    }
+    console.log("Discord register",response,code); // find out why the discord is not working TODO
+    
+    const { id, username } = response;
+    if (!id || !username) return res.sendStatus(500);
+    
+    // serch in database for account with this email and id of aud
+    const user = await usersApi.findUser({ where: { AND: [{ id: id }, { name: username }, { authProvider: "Discord" }], }, }).catch(err => console.log(err));
+    
+    if (user) return res.sendStatus(500, "User already exist");
+    
+    
+
+    // create new user TODO
+    // create new profile TODO
+    console.log("create user: id: ",response);
+    // TODO same username issue
+    // console.log("create user: aud: ",aud);
+    // const newUser = await usersApi.createFullUser({
+    //     username: decoded_data.email,
+    //     password: "GOOGLE",
+    //     authProvider: "Google",
+    //     aud: aud,
+    //     profile: {
+    //         create: {
+    //             profilename: decoded_data.name,
+    //             email: decoded_data.email,
+    //             picture: decoded_data.picture,                  
+    //         }
+    //     }
+    // }).catch(err => console.log(err));
+    
+
+    // if (!newUser) return res.sendStatus(500);
+    
+    // return res.sendStatus(200);
+}
+
+async function githubHandlerRegister(req, res, next) {
+    const code = req.body['code'];
+    if (!code) return res.sendStatus(500);
+    // validating the code
+    const response = await fetch(`https://api.github.com/user`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `token ${code}`
+        }
+    }).then(response => response.json()).catch(err => console.log(err));
+
+    if (response.message === 'Bad credentials') {
+        return res.sendStatus(500)
+    }
+    console.log("Github register",response,code);
+    const { name, node_id } = response;
+    if (!name || !node_id) return res.sendStatus(500);
+
+    // serch in database for account with this email and id of aud
+    const user = await usersApi.findUser({ where: { AND: [{ name: name }, { aud: node_id }, { authProvider: "Github" }], }, }).catch(err => console.log(err));
+
+    if (user) return res.sendStatus(500);
+
+    // create new user TODO
+    // create new profile TODO
+
 }
 
 async function customFormHandlerRegister(req, res, next) {
@@ -371,16 +449,15 @@ function createUserFromProviderRegister(req, res, next) {
     const provider = req.body['provider'];
 
     if (provider === "Google") {
-        // TODO
         googleHandlerRegister(req, res, next);
         return
     } else if (provider === "Discord") {
         // TODO
-        //discordHandlerRegister(req, res, next)
+        discordHandlerRegister(req, res, next)
         return
     } else if (provider === "Github") {
         // TODO
-        //githubHandlerRegister(req, res, next)
+        githubHandlerRegister(req, res, next)
         return
     } else if (provider === "CustomForm") {
         customFormHandlerRegister(req, res, next)

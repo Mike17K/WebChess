@@ -13,8 +13,7 @@ export default function DiscordRegisterButton(props) {
 
     const [profile,signOut,createUserCallback] = outerRegisterProvider({provider:"Discord"});
 
-    const DISCORD_IDENTIFY_URL = `https://discord.com/api/oauth2/authorize?client_id=${credentials.DISCORD_CLIENT_ID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%3Fprovider%3DDiscord&response_type=code&scope=identify`;
-    
+    const DISCORD_IDENTIFY_URL =`https://discord.com/api/oauth2/authorize?client_id=${credentials.DISCORD_CLIENT_ID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fregister%3Fprovider%3DDiscord&response_type=code&scope=identify`;
     const location = useLocation();
     const queryParams = queryString.parse(location.search);
     
