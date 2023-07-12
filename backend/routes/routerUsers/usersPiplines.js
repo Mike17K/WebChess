@@ -91,13 +91,13 @@ export const deleteTokenPipe = [(req, res, next) => validateAccessKey(req.header
 async function googleHandler(req, res, next) {
     const code = req.headers['code'];
     if (!code) return res.sendStatus(500); // here we had error if code == undefined its not exitig
-
+    
     const decoded_data = jwt_decode(code);
     const { email, aud, iss } = decoded_data;
     if (!email || !aud || !iss) return res.sendStatus(500);
-
+    
     if (iss !== 'https://accounts.google.com') return res.sendStatus(400); // validate iss
-
+    
     // serch in database for account with this email and id of aud
     const user = await usersApi.findUser({
         where: {
@@ -110,6 +110,8 @@ async function googleHandler(req, res, next) {
             profile: true
         },
     }).catch(err => console.log(err));
+    
+    console.log("googleHandler",user,aud);
 
     if (!user) return res.sendStatus(500);
     if (user.profile.email !== email) return res.sendStatus(500);
@@ -268,6 +270,55 @@ export const getTokenPipe = [checkTokenWithProvider, generateToken];
 ////////////////////////////////
 //       createUserPipe       //
 ////////////////////////////////
+async function googleHandlerRegister(req, res, next) {
+    const code = req.body['code'];
+    if (!code) return res.sendStatus(500); // here we had error if code == undefined its not exitig
+
+    const decoded_data = jwt_decode(code);
+    const { email, aud, iss } = decoded_data;
+    console.log(decoded_data);
+    if (!email || !aud || !iss) return res.sendStatus(500);
+
+    if (iss !== 'https://accounts.google.com') return res.sendStatus(400); // validate iss
+
+    // serch in database for account with this email and id of aud
+    const user = await usersApi.findUser({
+        where: {
+            AND: [
+                { aud: aud },
+                { authProvider: "Google" },
+            ],
+        },
+        include: {
+            profile: true
+        },
+    }).catch(err => console.log(err));
+
+    if (user) return res.sendStatus(500, "User already exist");
+    // create new user
+    // create new profile
+
+    // TODO same username issue
+    console.log("create user: aud: ",aud);
+    const newUser = await usersApi.createFullUser({
+        username: decoded_data.email,
+        password: "GOOGLE",
+        authProvider: "Google",
+        aud: aud,
+        profile: {
+            create: {
+                profilename: decoded_data.name,
+                email: decoded_data.email,
+                picture: decoded_data.picture,                  
+            }
+        }
+    }).catch(err => console.log(err));
+    
+
+    if (!newUser) return res.sendStatus(500);
+    
+    return res.sendStatus(200);
+}
 
 async function customFormHandlerRegister(req, res, next) {
     let name;
@@ -321,7 +372,7 @@ function createUserFromProviderRegister(req, res, next) {
 
     if (provider === "Google") {
         // TODO
-        //googleHandlerRegister(req, res, next);
+        googleHandlerRegister(req, res, next);
         return
     } else if (provider === "Discord") {
         // TODO

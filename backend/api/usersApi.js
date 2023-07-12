@@ -92,6 +92,13 @@ export async function findUser(query) {
   return user;
 }
 
+export async function createFullUser(data){
+  const user = await prisma.user.create({
+    data
+  });
+  return user;
+}
+
 export async function createUser({ username, password, salt, authProvider }) {
   const user = await prisma.user.create({
     data: {

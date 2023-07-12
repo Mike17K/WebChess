@@ -4,7 +4,7 @@ import './GoogleButton.css';
 import outerRegisterProvider from "../../../hooks/outerProvider/outerRegisterProvider";
 
 /* global google */
-export default function GoogleLoginButton(props) {    
+export default function GoogleRegisterButton(props) {    
    
     const [profile,signOut,createUserCallback] = outerRegisterProvider({provider:"Google"})
 
