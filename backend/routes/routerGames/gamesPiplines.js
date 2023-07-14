@@ -35,6 +35,38 @@ async function createNewGame(req, res, next) {
 
 export const newGamePipe = [createNewGame];
 
+////////////////////////////////
+//        joinGamePipe        //
+////////////////////////////////
+
+async function joinGame(req, res, next) {
+    // req {
+    //  profileId: string
+    //  accessServerKey: string
+    //  chessGameId: string
+    // }
+
+    const profileId = req.headers['profileid'];
+    const accessServerKey = req.headers['accessserverkey'];
+    const chessGameId = req.headers['chessgameid'];
+    
+    // check if profileId and accessServerKey are valid
+    const isValid = await usersApi.profileTokenValidation({ profileId:profileId, token: accessServerKey })
+    if (!isValid) return res.status(401).send({ error: 'Invalid profileId or accessServerKey' });
+
+    // join new game
+    const { url , accessKey, id, error } = await gamesApi.joinGame({ profileId:profileId, chessGameId:chessGameId });
+
+    if(error) return res.status(400).send({ error: error });
+    
+    // return url and accessKey
+    return res.status(200).send({ url, accessKey,id });
+}
+
+
+export const joinGamePipe = [joinGame];
+
+
 
 ////////////////////////////////
 //         addMovePipe        //
@@ -54,6 +86,7 @@ async function validatePlayer(req, res, next) {
 }
 
 async function addMove(req, res, next) {
+
     const { userId, gameId, sqIDFrom, sqIDTo, accessToken } = req.body;
     // update the pgn for this game TODO
 

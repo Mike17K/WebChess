@@ -64,12 +64,32 @@ export default function HomePage() {
         return <div key={index}>
           <div>{game.id}</div>
           <div>{game.url}</div>
+          <button onClick={async () => {
+            const profile = store.getState().profile.profile;
+            const { url, accessKey,id } = await fetch('http://localhost:5050/api/game/joinGame', {
+              method: 'GET',
+              headers: {
+                "profileId": profile.id,
+                "accessServerKey": profile.access_server_key,
+                "chessGameId":game.id
+                },
+                }).then(response => response.json());
+            
+            if(!url || !accessKey || !id) return console.log("Error: ",url,accessKey,id);
+            // redirect to the game page
+            setAccessGame({key:accessKey,url:url,id:id});
+            window.location.href = url;
+          }}
+          className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+          >Play Game</button>
+
           <button onClick={() => {
             // redirect to the game page
+            setAccessGame({key:"",url:game.url,id:game.id});
             window.location.href = game.url;
           }}
           className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
-          >Join Game</button>
+          >Spectate Game</button>
         </div>
       })
     }

@@ -33,6 +33,43 @@ export async function createNewGame({profileId}) {
     return {id:newGame.id,url:`http://localhost:3000/chessgame/${newGame.id}`,accessKey:newGame.accessKey};
 }
 
+export async function joinGame({ profileId, chessGameId }){
+    const chessGame = await prisma.chessGame.findFirst({
+        where: {
+          id: chessGameId,
+          status: 'WAITING_FOR_PLAYER',
+        },
+      });
+      
+      if (chessGame === null) return {error: 'Invalid chessGameId'};
+      if (chessGame.playerBlackId === null) {
+        const updatedChessGame = await prisma.chessGame.update({
+          where: { id: chessGameId },
+          data: {
+            playerBlack: {
+              connect: { id: profileId },
+            },
+            status: 'STARTED',
+          },
+        });
+        return {id:updatedChessGame.id,url:`http://localhost:3000/chessgame/${updatedChessGame.id}`,accessKey:updatedChessGame.accessKey};
+      }
+      if(chessGame.playerWhiteId === null) {
+        const updatedChessGame = await prisma.chessGame.update({
+          where: { id: chessGameId },
+          data: {
+            playerWhite: {
+              connect: { id: profileId },
+            },
+            status: 'STARTED',
+          },
+        });
+        return {id:updatedChessGame.id,url:`http://localhost:3000/chessgame/${updatedChessGame.id}`,accessKey:updatedChessGame.accessKey};
+      }
+
+      return {error: 'Game is full'};
+}
+
 export async function getChessGame({chessGameId}) {
     const chessGame = await prisma.chessGame.findFirst({
         where: {
@@ -72,6 +109,18 @@ export async function getChessGame({chessGameId}) {
     return { fen:chessGame.fen,playerWhite:chessGame.playerWhite, playerBlack:chessGame.playerBlack, pgn:chessGame.pgn, status:chessGame.status, startTime: chessGame.startTime, whitePlayerTime:chessGame.whitePlayerTime, blackPlayerTime:chessGame.blackPlayerTime };
 }
 
+export async function gameTokenValidation({ gameId, token }) {
+    const chessGame = await prisma.chessGame.findFirst({
+        where: {
+          id: gameId,
+          accessKey: token
+        }
+      });
+    
+      //if (chessGame === null) return false;
+      return true;
+}
+
 export async function validateAccessToken({accessKey, gameId}) {
     const chessGame = await prisma.chessGame.findFirst({
         where: {
@@ -82,6 +131,7 @@ export async function validateAccessToken({accessKey, gameId}) {
           visibility: true
         }
     });
+    if(chessGame === null) return false;
     // handle visibility 
     if(chessGame.accessKey === accessKey && chessGame.visibility === 'private') return true;
     if(chessGame.visibility === 'public') return true;
@@ -94,7 +144,6 @@ export async function validatePlayerId({ userId,gameId}){
             id: gameId,
         }
     });
-    console.log("validatePlayerId res: ",chessGame);
 
     if(chessGame.playerWhiteId === userId || chessGame.playerBlackId === userId) return true;
     return false;
@@ -106,8 +155,10 @@ export async function addMove({ userId,gameId, sqIDFrom, sqIDTo, accessToken }) 
             id: gameId,
         }
     });
+    if(chessGame === null) return 400;
     if(chessGame.accessKey !== accessToken) return 400;
-    if(chessGame.playerWhiteId === userId || chessGame.playerBlackId === userId){
+    let whiteIsPlaying = chessGame.fen.split(' ')[1] === 'w';
+    if((chessGame.playerWhiteId === userId && whiteIsPlaying) || (chessGame.playerBlackId === userId && !whiteIsPlaying)){
         // get fen and send the move to the engine with sqIDFrom and sqIDTo TODO
 
         const {fen, error} = simpleEngine.move(chessGame.fen,sqIDFrom,sqIDTo);
