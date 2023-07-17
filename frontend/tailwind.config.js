@@ -24,6 +24,11 @@ module.exports = {
         'green-highlight-light':'#b1c65d',
         'blue-highlight-dark':'#5b9eba',
         'blue-highlight-light':'#68aec6',
+
+        'main-black': '#374259',
+        'main-white': '#F2D8D8',
+        'main-green': '#545B77',
+        'main-gray': '#D46C51',
       },
     },
   },

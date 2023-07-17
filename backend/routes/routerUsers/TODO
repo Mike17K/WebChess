@@ -18,6 +18,17 @@ Test if
 
 - fix socket system for validating access
 
-- socket io for messaging system - running on another server not express but http
+- NAvbar =>>>>>>>>>>>>>>> !!!!!!!!!!!!!!!!!!!! next
+
+- profile page 
+
+(- when register login also)
+
+- when lgin redirect to home
+
+- make board work without chessgame for practice
+
+
+
 - highlight.io for highlighting code in any language and style super easy
 - react paypal js later for payments

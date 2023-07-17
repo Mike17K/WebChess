@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import NavBar from "./components/NavBar/NavBar.jsx";
+
 import TacticsPage from "./pages/TacticsPage/TacticsPage.jsx";
 import AdminPage from "./pages/AdminPage/AdminPage.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage.jsx";
@@ -11,6 +13,7 @@ function App(props) {
   return (
     <>
       <BrowserRouter basename="/">
+        <NavBar />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/tactics" element={<TacticsPage />} />
