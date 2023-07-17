@@ -32,7 +32,7 @@ function fenToPieceNamesArray(fen, board) {
   }
 }
 
-export default function ChessBoard({ fen, className, whiteSide }) {
+export default function ChessBoard({ fen, className, whiteSide, moveCallback }) {
   const [squares, setSquares] = useState([]);
   const draggableRef = useRef();
 
@@ -171,31 +171,33 @@ export default function ChessBoard({ fen, className, whiteSide }) {
               id={(r - 1) * 8 + c - 1}
               pos={{ x: c, y: r }}
               whiteSide={whiteSide}
-            />
-          );
-        }
-      }
-    } else {
-      for (let r = 8; r >= 1; r--) {
-        for (let c = 1; c <= 8; c++) {
-          sq.push(
-            <Square
-              state={state}
-              setState={setState}
-              highLightedColor={highLightedColor}
-              key={(r - 1) * 8 + c - 1}
-              id={(r - 1) * 8 + c - 1}
-              pos={{ x: c, y: r }}
-              whiteSide={whiteSide}
-            />
-          );
-        }
-      }
-    }
+              moveCallback={moveCallback}
+              />
+              );
+            }
+          }
+        } else {
+          for (let r = 8; r >= 1; r--) {
+            for (let c = 1; c <= 8; c++) {
+              sq.push(
+                <Square
+                state={state}
+                setState={setState}
+                highLightedColor={highLightedColor}
+                key={(r - 1) * 8 + c - 1}
+                id={(r - 1) * 8 + c - 1}
+                pos={{ x: c, y: r }}
+                whiteSide={whiteSide}
+                moveCallback={moveCallback}
+                />
+                );
+              }
+            }
+          }
     setSquares(sq);
   }, [whiteSide, state,highLightedColor /* not needed here as dependency */]);
-
-
+  
+  
   function handleDraggable(e) {
     if (state.draggingPiece === false) return;
     if (!draggableRef.current) return;

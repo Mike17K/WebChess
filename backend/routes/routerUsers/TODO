@@ -18,10 +18,6 @@ Test if
 
 - fix socket system for validating access
 
-
-- fix the game move update with sockets !!!!!! ====================================> THIS NEXT
-
-
 - socket io for messaging system - running on another server not express but http
 - highlight.io for highlighting code in any language and style super easy
 - react paypal js later for payments

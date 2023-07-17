@@ -48,6 +48,11 @@ io.on('connection', (socket) => {
     console.log('user disconnected');
   });
 
+  socket.on('moved-piece', (msg) => {
+    console.log('user moved-piece: ',msg);
+    room.emit('moved-piece', msg);
+  });
+
   socket.on('mousedown', (e) => {
     console.log('user mousedown: ',e.profileId);
     // !!!

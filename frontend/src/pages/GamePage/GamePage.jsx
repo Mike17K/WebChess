@@ -28,20 +28,29 @@ export default function GamePage() {
     console.log(chessgame)}).catch((err) => console.log(err));
   }, [chessgameid]);
 
+  const socket = io(URL, {
+    // Set the necessary options if needed
+    autoConnect: false,
+    query: {
+      scope: 'chessgame',
+      accessServerKey: profile.access_server_key,
+      profileId: profile.id,
+      chessGameid: chessgameid,
+      chessGameAccessKey: 'YOUR_ACCESS_KEY',
+    }
+  });
+
   useEffect(() => {
-    const socket = io(URL, {
-      // Set the necessary options if needed
-      autoConnect: false,
-      query: {
-        scope: 'chessgame',
-        accessServerKey: profile.access_server_key,
-        profileId: profile.id,
-        chessGameid: chessgameid,
-        chessGameAccessKey: 'YOUR_ACCESS_KEY',
-      }
-    });
 
     socket.connect();
+
+    socket.on('moved-piece', (data) => {
+      // fetch chessgame data
+      fetch(`http://localhost:5050/api/game/getChessGame/${chessgameid}`,
+      { method: "GET" }
+      ).then((res) => res.json()).then((chessgame) => {setData(chessgame)
+      console.log(chessgame)}).catch((err) => console.log(err));
+    });
 
     function mousedownhandle(e) {
         
@@ -50,7 +59,7 @@ export default function GamePage() {
 
         const data = {x:cursor_x,y:cursor_y};
         // identify the event as reaction
-        if (e.ctrlKey && e.which == 1) { //Mouse and control was pressed
+        if (e.ctrlKey && e.which === 1) { //Mouse and control was pressed
             socket.emit('mousedown', { chessGameid:chessgameid, chessGameAccessKey: 'YOUR_ACCESS_KEY', profileId: profile.id, data:data });
         }
         // control key 
@@ -86,13 +95,15 @@ export default function GamePage() {
       socket.disconnect();
       document.removeEventListener('mousedown', mousedownhandle);
     };
-  }, [chessgameid, profile]);
+  }, [chessgameid, profile,socket]);
 
   return (
     <>
       <div>GamePage</div>
+      Profile id: {profile.id}
+      <br />
       {chessgameid}
-      <ChessBoard fen={data.fen} whiteSide={whiteSide} />
+      <ChessBoard fen={data.fen} whiteSide={whiteSide} moveCallback={()=> socket.emit("moved-piece")}/>
       <button onClick={(e)=>{setWhiteSide(!whiteSide)}}>Rotate</button>
 
     </>

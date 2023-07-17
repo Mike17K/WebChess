@@ -60,7 +60,7 @@ function onDownLeftClickHandler(state,setState,pos){
 
 const highLightOptions = ["red", "yellow", "green", "blue"];
 
-export function Square({ id, pos, state, setState, whiteSide, highLightedColor }){
+export function Square({ id, pos, state, setState, whiteSide, highLightedColor, moveCallback }){
   const sqName = `${["a", "b", "c", "d", "e", "f", "g", "h"][pos.x - 1]}${pos.y}`;
   const piece = state.board[id];
   
@@ -156,6 +156,8 @@ export function Square({ id, pos, state, setState, whiteSide, highLightedColor }
         highLight: {blue:[],red:[],green:[],yellow:[]},
         draggingPiece: false
       });
+       console.log("moveCallback");
+      moveCallback();
     }).catch((err) => console.log(err));
     
     }else if(state.selected === sqName){
