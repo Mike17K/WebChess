@@ -2,7 +2,7 @@
 FROM node:14
 
 # Set the working directory in the container
-WORKDIR /backend
+WORKDIR /frontend
 
 # Copy package.json and package-lock.json (or yarn.lock) to the container
 COPY package*.json ./
@@ -11,10 +11,13 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the rest of the application source code to the container
-COPY . . 
+COPY . .
 
-# Expose the port on which your application will run
-EXPOSE 5050
+# Build the React app for production
+RUN npm run build
 
-# Start the application directly without using the entrypoint script
+# Expose the port on which your React app will run (typically 80 for HTTP)
+EXPOSE 80
+
+# Serve the built React app using a simple web server
 CMD ["npm", "start"]
