@@ -53,7 +53,7 @@ export default function HomePage() {
     }
   return (
     <>
-    <div>HomePage</div>
+    <div className='mt-[100px]'>HomePage</div>
 
     <button onClick={newGameHandle}>Play New Game</button>
 

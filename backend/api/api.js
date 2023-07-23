@@ -1,8 +1,34 @@
 import { validateObj } from '../HelperFunctions/index.js';
 import { PrismaClient } from '@prisma/client';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const prisma = new PrismaClient()
-prisma.$connect()
+// prisma.$connect();
+
+function connectToDatabase() {
+if (process.env.PRODUCTION === '1') {
+    prisma.$connect({ datasources: { db: { url: process.env.DATABASE_URL_DOCKER } } });
+} else {
+    prisma.$connect({ datasources: { db: { url: process.env.DATABASE_URL_LOCAL } } });
+}
+}
+
+while (true) {
+    connectToDatabase();
+    try{
+        const result = await prisma.$queryRaw`SELECT 1+1 as result;`;
+        console.log('Connected to database.');
+        break;
+    } 
+    catch (err) {
+        console.log('Failed to connect to database. Retrying...');
+    }
+
+    let starttime = Date.now();
+    while (Date.now() - starttime < 10000) {}
+}
+
 
 const availableEngines = ['stockfish'];
 const { controllers } = await import(`../controllers/index.js`);

@@ -23,6 +23,14 @@ The sign up for now is on the local path [/register](http://localhost:3000/regis
 
 # TO RUN
 
+## With Docker
+- clone the project localy
+- run ```docker-compose build```
+- run ```docker-compose up```
+- whait about a minute for the server to connect to the database
+- the project runs on http://localhost:3000
+
+## outdated but may work
 - clone the project localy
 - create a mysql connection and write the connection string to a .env file in the backend folder, in a variable of name DATABASE_URL ex: DATABASE_URL="mysql://root:password@localhost:3306/WebChessDb?schema=public"
 - cd into the backend folder

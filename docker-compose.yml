@@ -35,6 +35,8 @@ services:
 
   frontend:
     build: ./frontend
+    volumes:
+      - ./:/app  
     ports:
       - "3000:3000"
     networks:
