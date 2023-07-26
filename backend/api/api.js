@@ -5,6 +5,7 @@ dotenv.config();
 
 const prisma = new PrismaClient()
 // prisma.$connect();
+console.log("Connecting to database...");
 
 function connectToDatabase() {
 if (process.env.PRODUCTION === '1') {

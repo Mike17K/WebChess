@@ -2,7 +2,7 @@
 FROM node:14
 
 # Set the working directory in the container
-WORKDIR /backend
+WORKDIR /app
 
 # Copy package.json and package-lock.json (or yarn.lock) to the container
 COPY package*.json ./
@@ -17,4 +17,5 @@ COPY . .
 EXPOSE 5050
 
 # Start the application directly without using the entrypoint script
-CMD ["npm", "start"]
+CMD ["npx", "nodemon", "--legacy-watch", "app.js"]
+

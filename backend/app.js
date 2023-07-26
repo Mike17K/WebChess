@@ -2,7 +2,7 @@
 console.log("Starting...");
 const starttime = Date.now();
 while (Date.now() - starttime < 10000) {};
-console.log("ok");
+console.log("okey");
 
 import express from 'express';
 import { router } from './routes/router.js';

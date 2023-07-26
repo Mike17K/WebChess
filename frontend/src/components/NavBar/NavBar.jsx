@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom'
 import {store} from '../../redux/store'
 
 export default function NavBar() {
-    const [profile,setProfile] = useState(store.getState().profile.profile)
-    store.subscribe(()=>setProfile(store.getState().profile.profile))
+    const [profile,setProfile] = useState(store.getState().profile )
+    store.subscribe(()=>setProfile(store.getState().profile))
   return (
     <div className='fixed top-0 w-full h-[80px] bg-main-black shadow-lg'>
         <div className='flex justify-between items-center h-full px-4'>

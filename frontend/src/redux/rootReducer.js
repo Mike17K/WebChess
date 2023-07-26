@@ -11,16 +11,16 @@ const profileReducer = (state = INITIAL_STATE.profile, action) => {
         case "updateProfile":
             if(!action.profile) return state;
            return {
-             ...state, profile: {...state.profile ,...action.profile},
+             ...state.profile ,...action.profile
            };
         case "clearProfile":
            return {
-              ...state, profile: {},
+                ...INITIAL_STATE.profile,
            };
         case "setProfile":
             if(!action.profile) return state;
            return {
-              ...state, profile: {...action.profile},
+              ...action.profile,
            };
          default: return state;
         }
