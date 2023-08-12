@@ -24,7 +24,7 @@ export default function HomePage() {
     },[]);
 
     function newGameHandle(){
-      const profile = store.getState().profile.profile;
+      const profile = store.getState().profile;
       console.log(profile);
       if(profile=== undefined) return window.location.href = "http://localhost:3000/login";
         fetch('http://localhost:5050/api/game/newGame', {
@@ -65,7 +65,7 @@ export default function HomePage() {
           <div>{game.id}</div>
           <div>{game.url}</div>
           <button onClick={async () => {
-            const profile = store.getState().profile.profile;
+            const profile = store.getState().profile;
             const { url, accessKey,id } = await fetch('http://localhost:5050/api/game/joinGame', {
               method: 'GET',
               headers: {

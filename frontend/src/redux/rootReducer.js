@@ -9,9 +9,11 @@ const INITIAL_STATE = {
 const profileReducer = (state = INITIAL_STATE.profile, action) => {
     switch (action.type) {
         case "updateProfile":
+            console.log("Before profile: ", state);
+            console.log("After profile: ", state ,action.profile);
             if(!action.profile) return state;
            return {
-             ...state.profile ,...action.profile
+             ...state ,...action.profile
            };
         case "clearProfile":
            return {

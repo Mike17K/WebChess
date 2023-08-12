@@ -140,7 +140,7 @@ export async function getCategories(req, res) {
 export async function test(req, res) {
     console.log("test");
     
-    /*
+    // /*
     // add categories
     const categories = [
         {id:"5688562418",name:"B20 - 1.e4 c5"},
@@ -176,5 +176,5 @@ export async function test(req, res) {
     })
     console.log("Added");
     console.log(tactic);
-    */
+    // */
 }

@@ -16,7 +16,7 @@ const initDataState = {
 
 export default function GamePage() {
   const { chessgameid } = useParams();
-  const profile = store.getState().profile.profile;
+  const profile = store.getState().profile;
 
   const [data, setData] = useState(initDataState);
   const [whiteSide, setWhiteSide] = useState(true);
@@ -97,15 +97,32 @@ export default function GamePage() {
     };
   }, [chessgameid, profile,socket]);
 
-  return (
-    <>
-      <div>GamePage</div>
-      Profile id: {profile.id}
-      <br />
-      {chessgameid}
-      <ChessBoard fen={data.fen} whiteSide={whiteSide} moveCallback={()=> socket.emit("moved-piece")}/>
-      <button onClick={(e)=>{setWhiteSide(!whiteSide)}}>Rotate</button>
+  console.log(data);
 
-    </>
+  return (
+    <div className='mt-[100px]'>
+      <div>GamePage</div>
+      <br />
+      {
+        data.playerBlack && (
+          <div>
+            <div>playerBlack</div>
+            <img className="w-[30px]" src={data.playerBlack.profile.picture || process.env.PUBLIC_URL+'/assets/icons/profiles/profile-0.png'} alt="profile pic" />
+            <div>{data.playerBlack.profile.profilename}</div>
+          </div>
+        )
+      }
+      <ChessBoard className="w-[250px] " fen={data.fen} whiteSide={whiteSide} moveCallback={()=> socket.emit("moved-piece")}/>
+      <button onClick={(e)=>{setWhiteSide(!whiteSide)}}>Rotate</button>
+      {
+        data.playerWhite && (
+          <div>
+            <div>playerWhite</div>
+            <img className="w-[30px]" src={data.playerWhite.profile.picture || process.env.PUBLIC_URL+'/assets/icons/profiles/profile-0.png'} alt="profile pic" />
+            <div>{data.playerWhite.profile.profilename}</div>
+          </div>
+        )
+      }
+    </div>
   );
 }
