@@ -217,8 +217,8 @@ export default function ChessBoard({ fen, className, whiteSide, moveCallback }) 
   return (
     <>
       <div
-        className={`border-black relative mx-auto my-3 flex
-    aspect-square w-full flex-wrap justify-center border-4 bg-white align-middle ${className}`}
+        className={`${className} border-black relative mx-auto my-3 flex
+    aspect-square min-w-[200px] flex-wrap justify-center border-4 align-middle `}
         onMouseMove={(e) => {
           handleDraggable(e);
         }}
