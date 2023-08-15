@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import {validateAccessKey} from './routes/routerUsers/usersPiplines.js'
 const gamesApi = await import('./api/gamesApi.js');
+const usersApi = await import('./api/usersApi.js');
 
 const io = new Server({
   cors: {
@@ -43,6 +44,11 @@ io.on('connection', (socket) => {
   // the middleware is job is to validate users for each game based on the visibility of the game the want to access
   socket.join(socket.handshake.query.chessGameid); // join a room of chess
   const room = socket.to(socket.handshake.query.chessGameid) // not good practice but it has to be for security purpuses for the private rooms if someone changes the socket.chessGameid later when the middleware is not applied
+
+  // // get the profile of the user TODO  
+  usersApi.getProfile({ profileId: socket.handshake.query.profileId, userMode:"OWNER" }).then((profile)=>{
+    room.emit('user-connected', {name:profile.name,picture:4,rating:1500} );
+  })
 
   socket.on('disconnect', () => {
     console.log('user disconnected');

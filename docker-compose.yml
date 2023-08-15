@@ -33,14 +33,14 @@ services:
     depends_on:
       - db
 
-  frontend:
-    build: ./frontend
-    volumes:
-      - ./frontend:/app
-    ports:
-      - "3000:3000"
-    networks:
-      - app-network
+  # frontend:
+  #   build: ./frontend
+  #   volumes:
+  #     - ./frontend:/app
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:

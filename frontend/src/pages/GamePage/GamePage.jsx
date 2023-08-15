@@ -20,7 +20,8 @@ export default function GamePage() {
 
   const [data, setData] = useState(initDataState);
   const [whiteSide, setWhiteSide] = useState(true);
-
+  const [visitors, setVisitors] = useState([]);
+  
   useEffect(() => {
     fetch(`http://localhost:5050/api/game/getChessGame/${chessgameid}`,
      { method: "GET" }
@@ -43,6 +44,11 @@ export default function GamePage() {
   useEffect(() => {
 
     socket.connect();
+
+    socket.on('user-connected', (data) => {
+      console.log('user-connected', data);
+      setVisitors([...visitors, data]);
+    });
 
     socket.on('moved-piece', (data) => {
       // fetch chessgame data
@@ -95,7 +101,8 @@ export default function GamePage() {
       socket.disconnect();
       document.removeEventListener('mousedown', mousedownhandle);
     };
-  }, [chessgameid, profile,socket]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   console.log(data);
   // <br />
@@ -118,12 +125,126 @@ export default function GamePage() {
   //   )
   // }
 
+  const moveVisitor = (visitor) => {
+    const velocity_x = parseInt(visitor.getAttribute('velocity_x'));
+    const velocity_y = parseInt(visitor.getAttribute('velocity_y'));
+
+    visitor.style.top = `${parseInt(visitor.style.top) + velocity_y}px`;
+    visitor.style.left = `${parseInt(visitor.style.left) + velocity_x}px`;
+
+    if (parseInt(visitor.style.top) > window.innerHeight - 40) {
+      visitor.setAttribute('velocity_y', -1*velocity_y);
+    }
+    if (parseInt(visitor.style.top) < 0) {
+      visitor.setAttribute('velocity_y', -1*velocity_y);
+    }
+    if (parseInt(visitor.style.left) > window.innerWidth - 40) {
+      visitor.setAttribute('velocity_x', -1*velocity_x);
+    }
+    if (parseInt(visitor.style.left) < 0) {
+      visitor.setAttribute('velocity_x', -1*velocity_x);
+    }
+
+    // bounce on the box of chess too
+    const chessboard = document.querySelector('.ChessBoard');
+    if (chessboard) {
+      const chessboard_x = chessboard.getBoundingClientRect().x;
+      const chessboard_y = chessboard.getBoundingClientRect().y;
+      const chessboard_width = chessboard.getBoundingClientRect().width;
+      const chessboard_height = chessboard.getBoundingClientRect().height;
+      
+      const next_x = parseInt(visitor.style.left) + velocity_x;
+      const next_y = parseInt(visitor.style.top) + velocity_y;
+
+      if(next_x > chessboard_x && next_x < chessboard_x + chessboard_width && next_y > chessboard_y && next_y < chessboard_y + chessboard_height) {
+        // colision
+        if(velocity_x>0 && velocity_y>0){ // bug here TODO
+          // moving right and down
+          // posible colision on the left side and the top side
+          if(parseInt(visitor.style.left) - 40 <= chessboard_x ){ // colision on the left side
+            visitor.setAttribute('velocity_x', -1*velocity_x)
+            visitor.style.left = `${chessboard_x - 40}px`;
+          }else{
+            // colision on the top side
+            visitor.setAttribute('velocity_y', -1*velocity_y)
+            visitor.style.top = `${chessboard_y - 40}px`;
+          }
+      
+        }else if(velocity_x>0 && velocity_y<0){
+          // moving right and up
+          // posible colision on the left side and the bottom side
+          if(parseInt(visitor.style.left) - 40 <= chessboard_x ){ // colision on the left side
+            visitor.setAttribute('velocity_x', -1*velocity_x)
+            visitor.style.left = `${chessboard_x - 40}px`;
+          }else{
+            // colision on the bottom side
+            visitor.setAttribute('velocity_y', -1*velocity_y)
+            visitor.style.top = `${chessboard_y + chessboard_height}px`;
+          }
+
+        }else if(velocity_x<0 && velocity_y>0){
+          // moving left and down
+          // posible colision on the right side and the top side
+          if(parseInt(visitor.style.left) + 40 >= chessboard_x + chessboard_width ){ // colision on the right side
+            visitor.setAttribute('velocity_x', -1*velocity_x)
+            visitor.style.left = `${chessboard_x + chessboard_width}px`;
+          }else{
+            // colision on the top side
+            visitor.setAttribute('velocity_y', -1*velocity_y)
+            visitor.style.top = `${chessboard_y - 40}px`;
+          }
+
+        }else if(velocity_x<0 && velocity_y<0){
+          // moving left and up
+          // posible colision on the right side and the bottom side
+          if(parseInt(visitor.style.left) + 40 >= chessboard_x + chessboard_width ){ // colision on the right side
+            visitor.setAttribute('velocity_x', -1*velocity_x)
+            visitor.style.left = `${chessboard_x + chessboard_width}px`;
+          }else{
+            // colision on the bottom side
+            visitor.setAttribute('velocity_y', -1*velocity_y)
+            visitor.style.top = `${chessboard_y + chessboard_height}px`;
+          }
+        }
+        
+      }
+  }
+
+
+    
+  }
+
+  useEffect(() => {
+    const visitors = document.querySelectorAll('.visitor');
+
+    visitors.forEach((visitor) => {
+      visitor.style.top = `${Math.floor(Math.random() * 100)}vh`;
+      visitor.style.left = `${Math.floor(Math.random() * 100)}vw`;
+      visitor.style.zindex = 10;
+      visitor.setAttribute('velocity_x', Math.floor(1+Math.random()*2));
+      visitor.setAttribute('velocity_y', Math.floor(1+Math.random()*2));
+      
+      setInterval(moveVisitor, 20, visitor);
+    });
+  }, []);
+
   return (
-    <div className='w-[100vw] h-[100vh] flex justify-center items-center relative '>
+    <div className='w-[100vw] h-[100vh] flex justify-center items-center relative overflow-hidden'>
+      {
+        visitors.map((visitor,index) => {
+          return (
+            <div key={index} className='visitor w-[40px] h-[40px] absolute rounded-full flex flex-col items-center leading-4 transition-transform transition-500'>
+              <img src={`${process.env.PUBLIC_URL}/assets/icons/profiles/profile-${visitor.picture}.png`} alt="" className='w-full h-full'/>
+              <p className='text-[#caa93e]'>{visitor.name}</p>
+              <p className='text-[#74716a]'>{visitor.rating}</p>
+            </div>
+          )
+        })
+      }
       
       <div className='flex items-center relative'>
       
-      <div className='absolute top-[17px] -left-[200px] w-[150px] p-[5px] shadow-lg shadow-orange-400 border-4 border-grey rounded-xl flex justify-between'>
+      <div className='absolute top-[17px] -left-[200px] w-[150px] p-[5px] shadow-lg shadow-orange-400 border-4 border-grey rounded-xl flex justify-between bg-white'>
         <button onClick={(e)=>{}/* TODO */} className='p-2 border-transparent hover:border-green-700 hover:bg-green-400 border-4 rounded-lg transition-all'>
         <img src={`${process.env.PUBLIC_URL}/assets/icons/add-user.png`} alt="" className='w-[20px] h-[20px] '/>
         </button>
@@ -133,7 +254,7 @@ export default function GamePage() {
         </div>
       </div>
 
-      <div className='absolute -left-[200px] w-[150px] h-[400px] rounded-lg shadow-lg shadow-orange-400 border-4 border-grey gap-2 my-auto p-2 no-scrollbar overflow-y-auto'>
+      <div className='absolute -left-[200px] w-[150px] h-[400px] rounded-lg shadow-lg shadow-orange-400 border-4 border-grey gap-2 my-auto p-2 no-scrollbar overflow-y-auto bg-white'>
         <div className='w-full text-center transition-all'>
           <button className='shadow-md shadow-grey bg-[#fff9e7] w-full h-[30px] mb-4 px-4 flex justify-between group hover:border-2'>
               <p className='text-[#3d6ac4] my-auto'>Kd8</p>
@@ -151,7 +272,7 @@ export default function GamePage() {
 
         <div className=''>
           <div className='w-full mb-[18px] relative'>
-            <button className='h-[50px] w-[150px] absolute bottom-0 left-0 p-1 shadow-orange-400 shadow-md hover:border-2 border-4 rounded-full transition-all flex'>
+            <button className='h-[50px] w-[150px] absolute bottom-0 left-0 p-1 shadow-orange-400 shadow-md hover:border-2 border-4 rounded-full transition-all flex bg-white'>
               <div className='h-full aspect-square bg-[#eeb05e59] rounded-full overflow-hidden flex justify-center items-center'>
                 <img src={`${process.env.PUBLIC_URL}/assets/icons/profiles/profile-2.png` /* TODO profile pic */} alt="" className='w-full h-full my-auto'/>
               </div>
@@ -162,14 +283,14 @@ export default function GamePage() {
 
             </button>
 
-            <div className='h-[40px] w-[100px] absolute bottom-0 right-0 rounded-lg shadow-md shadow-orange-400 border-4 border-grey flex justify-center items-center gap-2 my-auto'>
+            <div className='h-[40px] w-[100px] absolute bottom-0 right-0 rounded-lg shadow-md shadow-orange-400 border-4 border-grey flex justify-center items-center gap-2 my-auto bg-white'>
                 <p className='text-[#ff8e8e]'>18:61 {/* time remaining TODO */}</p>
             </div>
           </div>
-        <ChessBoard className="w-[600px] aspect-square" fen={data.fen} whiteSide={whiteSide} moveCallback={()=> socket.emit("moved-piece")}/>
-          <div className='w-full mt-[18px] relative'>
+        <ChessBoard className="ChessBoard w-[600px] z-0 aspect-square" fen={data.fen} whiteSide={whiteSide} moveCallback={()=> socket.emit("moved-piece")}/>
+          <div className='w-full mt-[18px] relative '>
             
-            <button className='h-[50px] w-[150px] absolute top-0 left-0 p-1 shadow-orange-400 shadow-md hover:border-2 border-4 rounded-full transition-all flex'>
+            <button className='h-[50px] w-[150px] absolute top-0 left-0 p-1 shadow-orange-400 shadow-md hover:border-2 border-4 rounded-full transition-all flex bg-white'>
               <div className='h-full aspect-square bg-[#eeb05e59] rounded-full overflow-hidden flex justify-center items-center'>
                 <img src={`${process.env.PUBLIC_URL}/assets/icons/profiles/profile-2.png` /* TODO profile pic */} alt="" className='w-full h-full my-auto'/>
               </div>
@@ -180,7 +301,7 @@ export default function GamePage() {
 
             </button>
 
-            <div className='h-[40px] w-[100px] absolute top-0 right-0 rounded-lg shadow-md shadow-orange-400 border-4 border-grey flex justify-center items-center gap-2 my-auto'>
+            <div className='h-[40px] w-[100px] absolute top-0 right-0 rounded-lg shadow-md shadow-orange-400 border-4 border-grey flex justify-center items-center gap-2 my-auto bg-white'>
                 <p className='text-[#ff8e8e]'>8:61 {/* time remaining TODO */}</p>
             </div>
           </div>
