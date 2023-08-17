@@ -7,7 +7,7 @@ export default function NavBar() {
     const [profile,setProfile] = useState(store.getState().profile )
     store.subscribe(()=>setProfile(store.getState().profile))
   return (
-    <div className='fixed top-0 w-full h-[40px] bg-main-black shadow-lg'>
+    <div className='z-50 fixed top-0 w-full h-[40px] bg-main-black shadow-lg'>
         <div className='flex justify-between items-center h-full px-4'>
             <Link to='/'>
                 <div className='text-[#ffffff] font-bold text-xl'>Logo</div>

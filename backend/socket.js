@@ -38,27 +38,47 @@ return next(new Error("Errors."));
 // Apply the middleware to all incoming connections
 io.use(checkAccessKey);
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  // socket.handshake conains the info about the game and room
-  // the middleware is job is to validate users for each game based on the visibility of the game the want to access
-  socket.join(socket.handshake.query.chessGameid); // join a room of chess
-  const room = socket.to(socket.handshake.query.chessGameid) // not good practice but it has to be for security purpuses for the private rooms if someone changes the socket.chessGameid later when the middleware is not applied
 
-  // // get the profile of the user TODO  
-  usersApi.getProfile({ profileId: socket.handshake.query.profileId, userMode:"OWNER" }).then((profile)=>{
-    room.emit('user-connected', {name:profile.name,picture:4,rating:1500} );
-  })
+
+const users = []
+
+const getUsersInRoom = (room) => {
+  return users.filter((user) => user.room === room)
+}
+
+io.on('connection', async (socket) => {
+  console.log('a user connected');
+  
+  const roomId = socket.handshake.query.chessGameid;
+  const profileId = socket.handshake.query.profileId; // i can add hash here propably for security
+  const profile = await usersApi.getProfile({ profileId, userMode:"OWNER" });
+
+  socket.join(roomId);
+  const room = socket.to(roomId);
+  const user = { id: profileId, name: profile.name, rating: 1900, picture:4, room:roomId };// TODO get the rating from the database
+  users.push(user); 
+  room.emit('user-connected', user);
+
+  socket.on('get-room-data', () => {
+    socket.emit('sent-room-data', getUsersInRoom(roomId));
+  });
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
-  });
-
+    // remove the user from the users array
+    const index = users.findIndex((user) => user.id === profileId)
+    room.emit('user-disconnected', profileId);  
+    if (index !== -1) {
+      return users.splice(index, 1)[0]
+    }
+    
+  } )
+  
   socket.on('moved-piece', (msg) => {
     console.log('user moved-piece: ',msg);
     room.emit('moved-piece', msg);
   });
-
+  
   socket.on('mousedown', (e) => {
     console.log('user mousedown: ',e.profileId);
     // !!!
