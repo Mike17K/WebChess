@@ -16,6 +16,7 @@ export default function outerLoginProvider(props) {
         if(session.provider === undefined) return;
         if(session.profile.profile === undefined) return;
         if(session.access_server_key === undefined) return;
+        if(session.refresh_token === undefined) return;
         if(session.profile.id === undefined) return;
     
         // revoke the access tocken from server
@@ -23,6 +24,23 @@ export default function outerLoginProvider(props) {
             method:"DELETE",
             headers: {
                 'token': session.access_server_key,
+                'userid': session.profile.id
+            }}).then(response =>{
+                if(!response.ok){
+                    console.log("Something went wrong");
+                    return;
+                } 
+                callback();
+                clearProfile();
+                console.log("Logged out")
+            }).catch(err=> {
+                console.log("Logout error: ",err)
+            }
+        );
+        fetch('http://localhost:5050/api/users/token',{
+            method:"DELETE",
+            headers: {
+                'token': session.refresh_token,
                 'userid': session.profile.id
             }}).then(response =>{
                 if(!response.ok){
@@ -49,7 +67,12 @@ export default function outerLoginProvider(props) {
             }
             }).then(data => data.json()).then(data =>{
                 // get access key from server
-                updateProfile({access_server_key:data.access_server_key,id:data.userId});
+                updateProfile({
+                    access_server_key:data.access_server_key,
+                    id:data.userId,
+                    refresh_token:data.refresh_token,
+                    ttl:data.ttl + Date.now()
+                });
                 callback(data);
                 }).catch(err=> {
                     console.log(err)
@@ -76,7 +99,6 @@ export default function outerLoginProvider(props) {
         });
     }
 
-    
     // sign out function 
     function signOut(callback=()=>{}) {
         revokeServerToken(callback);

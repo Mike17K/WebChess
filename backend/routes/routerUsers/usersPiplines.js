@@ -235,10 +235,10 @@ async function checkTokenWithProvider(req, res, next) {
 
 }
 
+/*
 function generateAccessToken(user) {
     return jwt.sign({ name: user.name, userId: user.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' });
 }
-/*
 jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) {
             console.log(err);
@@ -252,19 +252,66 @@ jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
 
 async function generateToken(req, res) {
     const access_server_key = crypto.randomBytes(64).toString('hex');
-    const ttl = 2000000;
+    const ttl = 2000*1000; // 2000 seconds = 33 minutes
     const userId = req.userId;
-    const status = await usersApi.setToken(userId, access_server_key, ttl);
+    const status = await usersApi.setToken(userId, access_server_key, ttl,"ACCESS");
 
-    if (status) {
-        console.log({ access_server_key: access_server_key, ttl: ttl, userId: userId });
-        res.json({ access_server_key: access_server_key, ttl: ttl, userId: userId });
+    const refresh_token = crypto.randomBytes(64).toString('hex');
+    const ttl_refresh = 1000000 * 1000; // 1000000 seconds = 11 days
+    const status_refresh = await usersApi.setToken(userId, refresh_token, ttl_refresh,"REFRESH");
+
+    if (status && status_refresh) {
+        console.log({ access_server_key: access_server_key, refresh_token:refresh_token, ttl: ttl, userId: userId });
+        res.json({ access_server_key: access_server_key,refresh_token:refresh_token, ttl: ttl, userId: userId });
         return;
     }
     res.sendStatus(400);
 }
 
 export const getTokenPipe = [checkTokenWithProvider, generateToken];
+
+////////////////////////////////
+// refreshAccessServerKeyPipe //
+////////////////////////////////
+
+async function isRefreshTokenValid(req, res, next) {
+    // is post request
+    const userId = req.body['userId'];
+    const refresh_token = req.body['refresh_token'];
+
+    if (!userId || !refresh_token) return res.sendStatus(400);
+
+    const user = await usersApi.findUser({ where: { id: userId }, 
+        include: { accessTokens: { where: { token: refresh_token } } }
+    }).catch(err => console.log(err));
+
+    if (!user) return res.sendStatus(400);
+    // check if token is expired
+
+    const isExpired = user.accessTokens[0].expired < new Date();
+    const token_type = user.accessTokens[0].type;
+    console.log("Refresh token is expred: ",isExpired);
+
+    if (isExpired || token_type !== "REFRESH") return res.sendStatus(400);
+
+    next();
+}
+
+async function updateAccessServerKey(req, res) {
+    const access_server_key = crypto.randomBytes(64).toString('hex');
+    const ttl = 2000*1000; // 2000 seconds = 33 minutes
+    const userId = req.body['userId'];
+    const status = await usersApi.setToken(userId, access_server_key, ttl,"ACCESS");
+
+    if (status) {
+        console.log({ access_server_key: access_server_key, ttl: ttl });
+        res.json({ access_server_key: access_server_key, ttl: ttl});
+        return;
+    }
+    res.sendStatus(400);
+}
+
+export const refreshAccessServerKeyPipe = [isRefreshTokenValid, updateAccessServerKey];
 
 ////////////////////////////////
 //       createUserPipe       //

@@ -4,6 +4,7 @@ import {store} from "../../redux/store"
 const setAccessGame = (data) => store.dispatch({type:"setAccessGame",accessGame:{id:data.id,key:data.key,url:data.url}})
 // const clearAccessGame = (data) => store.dispatch({type:"clearAccessGame"})
 
+
 export default function HomePage() {
     const [publicGames, setPublicGames] = useState([]);
 
@@ -58,6 +59,7 @@ export default function HomePage() {
     <button onClick={newGameHandle}>Play New Game</button>
 
     <br/>
+    
     <h2>Join Games</h2>
     {
       publicGames.map((game,index) => {

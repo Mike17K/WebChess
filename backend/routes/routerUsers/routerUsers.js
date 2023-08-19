@@ -14,6 +14,9 @@ routerUsers.get('/profile/:profileId/me', userPiplines.getMyProfilePipe); // hea
 routerUsers.delete('/token', userPiplines.deleteTokenPipe); //headers: {'token': , 'profileId': }
 routerUsers.get('/token', userPiplines.getTokenPipe); //headers: {'token': response.credential,"provider":"google"} 
 
+routerUsers.post('/refreshAccessServerKey', userPiplines.refreshAccessServerKeyPipe); //headers: {'token': response.credential,"provider":"google"} 
+
+
 routerUsers.post('/createUser', userPiplines.createUserPipe); // body: {'code': response.credential ???? ,"provider":"google"} TODO
 
 

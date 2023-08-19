@@ -63,11 +63,17 @@ model Profile {
 model Token{
   id String  @id @default(uuid())
   token String
+  type TokenType @default(ACCESS)
   created DateTime  @default(now())
   expired DateTime
 
   userid String
   belongsTo User @relation(fields: [userid], references: [id])
+}
+
+enum TokenType {
+  ACCESS
+  REFRESH
 }
 
 enum Role {

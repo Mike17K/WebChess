@@ -70,14 +70,14 @@ export async function deleteToken(userId, token) {
   return result ? 200 : 400;
 }
 
-export async function setToken(userId, access_server_key, ttl) {
+export async function setToken(userId, access_server_key, ttl,type) {
   const result = await prisma.user.update({
     where: {
       id: userId,
     },
     data: {
       accessTokens: {
-        create: { token: access_server_key, expired: new Date(Date.now() + ttl) },
+        create: { token: access_server_key, expired: new Date(Date.now() + ttl), type: type },
       },
     },
     include: {
