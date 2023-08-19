@@ -1,10 +1,25 @@
-export default function VisitorMoveLogic(visitor) {
-    
-const velocity_x = parseInt(visitor.getAttribute('velocity_x'));
-const velocity_y = parseInt(visitor.getAttribute('velocity_y'));
+const speed = 5;
 
-visitor.style.top = `${parseInt(visitor.style.top) + velocity_y}px`;
-visitor.style.left = `${parseInt(visitor.style.left) + velocity_x}px`;
+export default function VisitorsMoveLogic() {
+    document.querySelectorAll('.visitor').forEach(visitor => {
+
+    const velocity_x_attr = visitor.getAttribute('velocity_x')
+    let velocity_x = parseFloat(velocity_x_attr);
+    if (velocity_x_attr == null || velocity_x_attr == undefined || isNaN(velocity_x)) {
+      visitor.setAttribute('velocity_x', Math.random()*speed  );
+      velocity_x = parseFloat(visitor.getAttribute('velocity_x'));
+    }
+
+    const velocity_y_attr = visitor.getAttribute('velocity_y')
+    let velocity_y = parseFloat(velocity_y_attr);
+    if (velocity_y_attr == null || velocity_y_attr == undefined || isNaN(velocity_y)) {
+      visitor.setAttribute('velocity_y', Math.sqrt(speed*speed - velocity_x*velocity_x)  );
+      velocity_y = parseFloat(visitor.getAttribute('velocity_y'));
+    }
+
+visitor.style.top = `${parseInt(visitor.style.top || "100px") + velocity_y}px`;
+
+visitor.style.left = `${parseInt(visitor.style.left || "100px") + velocity_x}px`;
 
 if (parseInt(visitor.style.top) > window.innerHeight - 40) {
   visitor.setAttribute('velocity_y', -1*velocity_y);
@@ -84,6 +99,5 @@ if (chessboard) {
   }
 }
 
-
-
+    });
 }
