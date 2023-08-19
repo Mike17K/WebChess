@@ -3,7 +3,7 @@ import { store } from "../../redux/store";
 
 const URL = 'http://localhost:5050';
 
-export default function GamePageSockets({chessgameid, setData, setMySocket, setVisitors}) {
+export default function GamePageSockets({chessgameid, setData, setMySocket, setVisitors,setVotedMoves}) {
     const profile = store.getState().profile;
 
     const socket = io(URL, {
@@ -20,7 +20,21 @@ export default function GamePageSockets({chessgameid, setData, setMySocket, setV
       setMySocket(socket);
   
       socket.connect();
-  
+
+      socket.on('voted-move', ({move}) => {
+        // {move: "e4", votes: 50},
+        console.log('voted-move', move);
+        setVotedMoves(prevVotedMoves => {
+          const index = prevVotedMoves.findIndex(votedMove => votedMove.move === move);
+          if(index === -1){
+            return [...prevVotedMoves, {move,votes:1}]; // add new move
+          }
+          prevVotedMoves[index].votes += 1;
+          return [...prevVotedMoves];
+        });
+      });        
+        
+
       socket.on('sent-room-data', (data) => {
         console.log('roomData: ', data);
         setVisitors(data);
@@ -40,7 +54,9 @@ export default function GamePageSockets({chessgameid, setData, setMySocket, setV
         // fetch chessgame data
         fetch(`${URL}/api/game/getChessGame/${chessgameid}`,
         { method: "GET" }
-        ).then((res) => res.json()).then((chessgame) => {setData(chessgame)
+        ).then((res) => res.json()).then((chessgame) => {
+          setData(chessgame);
+          setVotedMoves([]);
         console.log(chessgame)}).catch((err) => console.log(err));
       });
   

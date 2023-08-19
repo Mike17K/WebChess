@@ -24,7 +24,12 @@ export default function GamePage() {
   const [whiteSide, setWhiteSide] = useState(true);
   const [visitors, setVisitors] = useState([]);
   const [mysocket, setMySocket] = useState(null);
-  
+  const [votedMoves, setVotedMoves] = useState([
+    {move: "e4", votes: 50},
+    {move: "e5", votes: 48},
+    {move: "Nf3", votes: 40},
+    {move: "Nc6", votes: 30}
+  ]); // [{move: "e4", votes: 0}, {move: "e5", votes: 0}  
   
   useEffect(() => {
     fetch(`http://localhost:5050/api/game/getChessGame/${chessgameid}`,
@@ -35,7 +40,7 @@ export default function GamePage() {
 
 
   useEffect(() => {
-    GamePageSockets({chessgameid, setData, setMySocket, setVisitors});
+    GamePageSockets({chessgameid, setData, setMySocket, setVisitors,setVotedMoves});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -53,7 +58,7 @@ export default function GamePage() {
   return (
     <div className='w-[100vw] h-[100vh] z-0 flex justify-center items-center relative overflow-hidden'>
       {
-        visitors.map((visitor,index) => {
+        visitors.map((visitor) => {
           return (
             <div 
              key={visitor.id} className='visitor z-0 top-[80px] left-[80px] w-[40px] h-[40px] absolute rounded-full flex flex-col items-center leading-4 transition-transform transition-500'>
@@ -68,11 +73,28 @@ export default function GamePage() {
       <div className='flex items-center relative'>
       
         <VisitorsInfoWidget visitors={visitors} />
-        <MoveVoterWidget />
-
+        <MoveVoterWidget votedMoves={votedMoves.sort((a, b) => {return b.votes-a.votes;})} />
         <div className=''>
           <PlayerLayout bottomPlayer={false} player={{picture:4,name:"Mike17K",rating:1955}} timeRemaining={"8:29"} />
-        <ChessBoard className="ChessBoard w-[600px] z-0 aspect-square" fen={data.fen} whiteSide={whiteSide} moveCallback={()=> mysocket.emit("moved-piece")}/>
+        <ChessBoard className="ChessBoard w-[600px] z-0 aspect-square" 
+        fen={data.fen} 
+        whiteSide={whiteSide} 
+        setVotedMoves={setVotedMoves}
+        moveCallback={()=> mysocket.emit("moved-piece")}
+        onSquarePressCallback={({sqIDFrom,sqIDTo,userId,gameId,accessToken,accessServerKey})=>{
+          // console.log("vote-move", {sqIDFrom,sqIDTo,userId});
+          mysocket.emit("vote-move", {sqIDFrom,sqIDTo,userId} ); // also this is unsafe make it work with jwt in the future TODO
+          const move = `${sqIDFrom}-${sqIDTo}`;
+          setVotedMoves(prevVotedMoves => {
+            const index = prevVotedMoves.findIndex(votedMove => votedMove.move === move);
+            if(index === -1){
+              return [...prevVotedMoves, {move,votes:1}]; // add new move
+            }
+            prevVotedMoves[index].votes += 1;
+            return [...prevVotedMoves];
+          });
+        }
+        }/>
           <PlayerLayout bottomPlayer={true} player={{picture:1,name:"Mike",rating:1903}} timeRemaining={"5:41"} />
         </div>
       </div>

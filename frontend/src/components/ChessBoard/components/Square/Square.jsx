@@ -60,7 +60,7 @@ function onDownLeftClickHandler(state,setState,pos){
 
 const highLightOptions = ["red", "yellow", "green", "blue"];
 
-export function Square({ id, pos, state, setState, whiteSide, highLightedColor, moveCallback }){
+export function Square({ id, pos, state, setState,setVotedMoves, whiteSide, highLightedColor, moveCallback,onSquarePressCallback }){
   const sqName = `${["a", "b", "c", "d", "e", "f", "g", "h"][pos.x - 1]}${pos.y}`;
   const piece = state.board[id];
   
@@ -119,15 +119,17 @@ export function Square({ id, pos, state, setState, whiteSide, highLightedColor, 
       let accessServerKey;
       try{
         const state = store.getState();
-        userId = state.profile.profile.id;
+        userId = state.profile.id;
         gameId = state.games.accessGame.id;
         accessToken = state.games.accessGame.key;
-        accessServerKey = state.profile.profile.access_server_key;
-        console.log(userId,gameId,accessToken,accessServerKey);
+        accessServerKey = state.profile.access_server_key;
+        // console.log(userId,gameId,accessToken,accessServerKey);
       }catch(err){
         console.log(err);
         return;
       }
+
+      onSquarePressCallback({sqIDFrom:selectedId,sqIDTo:id,userId,gameId,accessToken,accessServerKey});
 
       // submit a move to the server
       fetch(`http://localhost:5050/api/game/addMove`, {
@@ -148,6 +150,7 @@ export function Square({ id, pos, state, setState, whiteSide, highLightedColor, 
       if( data.error || !data) return;
       
       console.log(data);
+      setVotedMoves([]);
       setState({
         board: data.board,
         selected: null, 

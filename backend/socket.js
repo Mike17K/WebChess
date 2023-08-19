@@ -55,13 +55,23 @@ io.on('connection', async (socket) => {
 
   socket.join(roomId);
   const room = socket.to(roomId);
-  const user = { id: profileId, name: profile.name, rating: 1900, picture:4, room:roomId };// TODO get the rating from the database
+  const user = { id: profileId, name: profile.name, rating: 1900, picture:4, room:roomId,move: null };// TODO get the rating from the database
   users.push(user); 
   room.emit('user-connected', user);
 
   socket.on('get-room-data', () => {
     socket.emit('sent-room-data', getUsersInRoom(roomId));
   });
+
+  
+  socket.on('vote-move', ({sqIDFrom,sqIDTo,userId}) => {
+    // here it should be checked with the use of jwt TODO
+    const move = `${sqIDFrom}-${sqIDTo}`;
+    users.filter((user) => user.id === userId)[0].move = move;
+    console.log("voted-move: ",move);
+    room.emit('voted-move', {move:move});
+  });
+
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
@@ -76,6 +86,9 @@ io.on('connection', async (socket) => {
   
   socket.on('moved-piece', (msg) => {
     console.log('user moved-piece: ',msg);
+    users.forEach(user => {
+      user.move = null;
+    });
     room.emit('moved-piece', msg);
   });
   

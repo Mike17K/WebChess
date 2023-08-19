@@ -15,8 +15,11 @@ function generateMoves_Pawn(piecePos,board,fen){
     const startRow = pieceColor === 'w' ? 1 : 6;
     if(startRow === Math.floor(piecePos/8)){
         // pawn is on start row
-        if(board[piecePos+directions[0]] === '' && board[piecePos+directions[1]] === ''){
+        if(board[piecePos+directions[0]] === ''){
             moves.push(piecePos+directions[0]);
+        }
+        if(board[piecePos+directions[0]] === '' && board[piecePos+directions[1]] === ''){
+            
             moves.push(piecePos+directions[1]);
         }
     }
