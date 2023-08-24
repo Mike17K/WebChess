@@ -19,7 +19,14 @@ export default function LoginPage(props) {
 
     if (!name || !password) return;
 
-    getProfileCallback({ code: JSON.stringify({ name, password }) });
+    getProfileCallback({ code: JSON.stringify({ name, password }) }, (data) => {
+      if (data.error) {
+        console.log(data.error);
+        return;
+      }
+      console.log(data);
+      window.location.href = "http://localhost:3000/";
+    });
 
     e.target.reset(); // clear form
   }

@@ -8,6 +8,7 @@ const setAccessGame = (data) => store.dispatch({type:"setAccessGame",accessGame:
 export default function HomePage() {
     const [publicGames, setPublicGames] = useState([]);
 
+    // fetch the public games
     useEffect(() => {
       fetch('http://localhost:5050/api/game/publicGames', {
         method: 'GET',

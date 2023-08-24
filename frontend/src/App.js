@@ -11,6 +11,7 @@ import HomePage from "./pages/HomePage/HomePage.jsx";
 
 import { store } from "./redux/store.js";
 import { useEffect } from "react";
+import ProfilePage from "./pages/ProfilePage/ProfilePage.jsx";
 
 async function refreshAccessServerKey(){
   console.log("refreshed access_server_key...");
@@ -33,7 +34,7 @@ async function refreshAccessServerKey(){
 
   store.dispatch({type:"updateProfile",profile:{access_server_key:access_server_key,ttl:ttl + Date.now()}});
 
-  const timeToWait = ttl + 100;
+  const timeToWait = ttl - 1000;
   console.log("timeToWait: ",timeToWait);
   setTimeout(() => {
     refreshAccessServerKey();
@@ -61,6 +62,7 @@ function App(props) {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/chessgame/:chessgameid" element={<GamePage />} />
+          <Route path="/profile/:profileid" element={<ProfilePage />} />
         </Routes>
       </BrowserRouter>
     </>
