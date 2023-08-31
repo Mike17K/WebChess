@@ -58,6 +58,7 @@ export default function GamePage() {
       }
     }, []);
     console.log("Game Page Rendered");
+    console.log("Data: ",data);
 
   return (
     <div className='w-[100vw] h-[100vh] z-0 flex justify-center items-center relative overflow-hidden'>
@@ -76,7 +77,7 @@ export default function GamePage() {
       
       <div className='flex items-center relative'>
       
-        <VisitorsInfoWidget visitors={visitors} />
+        <VisitorsInfoWidget visitors={visitors} gameUrl={`http://localhost:3000/chessgame/${chessgameid}`}/>
         <MoveVoterWidget 
           votedMove={votedMove}
           setVotedMove={(move,userId=profile.id) => {
@@ -92,7 +93,7 @@ export default function GamePage() {
           votedMoves={votedMoves.sort((a, b) => {return b.votes-a.votes;})} 
         />
         <div className=''>
-          <PlayerLayout bottomPlayer={false} player={{picture:4,name:"Mike17K",rating:1955, url: "http://localhost:3000/profile/me"}} timeRemaining={"8:29"} />
+          <PlayerLayout bottomPlayer={false} player={(whiteSide)?data.playerBlack:data.playerWhite} timeRemaining={(whiteSide)?data.blackPlayerTime:data.whitePlayerTime} />
         <ChessBoard className="ChessBoard w-[600px] z-0 aspect-square" 
         fen={data.fen} 
         whiteSide={whiteSide} 
@@ -115,7 +116,7 @@ export default function GamePage() {
           });
         }
         }/>
-          <PlayerLayout bottomPlayer={true} player={{picture:1,name:"Mike",rating:1903,url: "http://localhost:3000/profile/me"}} timeRemaining={"5:41"} />
+          <PlayerLayout bottomPlayer={true} player={(whiteSide)?data.playerWhite:data.playerBlack} timeRemaining={(whiteSide)?data.whitePlayerTime:data.blackPlayerTime} />
         </div>
       </div>
       {/* <button onClick={(e)=>{setWhiteSide(!whiteSide)}}>Rotate</button> */}

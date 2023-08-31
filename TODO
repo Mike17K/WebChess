@@ -1,4 +1,5 @@
-- fix the voting system
+- fix the backend to support the game page info for players as pric score profile <----  next
+
 - add chat to game page
 
 - navbar fix visuals
@@ -6,3 +7,5 @@
 - profile page
 
 - make a queue system for players
+
+

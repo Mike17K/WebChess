@@ -69,7 +69,7 @@ export default function HomePage() {
           <div>{game.url}</div>
           <button onClick={async () => {
             const profile = store.getState().profile;
-            const { url, accessKey,id } = await fetch('http://localhost:5050/api/game/joinGame', {
+            const { url, accessKey,id, error } = await fetch('http://localhost:5050/api/game/joinGame', {
               method: 'GET',
               headers: {
                 "profileId": profile.id,
@@ -77,6 +77,13 @@ export default function HomePage() {
                 "chessGameId":game.id
                 },
                 }).then(response => response.json());
+            
+                console.log("error: ",error);
+            if(error == 'You are already in the game'){
+              setAccessGame({key:"",url:game.url,id:game.id});
+              window.location.href = game.url;
+              return;
+            }
             
             if(!url || !accessKey || !id) return console.log("Error: ",url,accessKey,id);
             // redirect to the game page

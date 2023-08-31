@@ -115,6 +115,7 @@ export async function createProfile({ profilename, userId }) {
   const profile = await prisma.profile.create({
     data: {
       profilename: profilename,
+      picture: (1+Math.floor(Math.random()*5)).toString(),
       user: {
         connect: { id: userId },
       },

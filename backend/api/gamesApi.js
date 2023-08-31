@@ -41,7 +41,25 @@ export async function joinGame({ profileId, chessGameId }){
         },
       });
       
-      if (chessGame === null) return {error: 'Invalid chessGameId'};
+      if (chessGame === null) {
+        // check if the user is already in a game of status STARTED
+        const chessGame_started = await prisma.chessGame.findFirst({
+          where: {
+            id: chessGameId,
+            status: 'STARTED',
+          },
+        });
+
+        if(chessGame_started == null) return {error: 'Invalid chessGameId'};
+
+        // check if the player is already in the game
+        if(chessGame_started.playerWhiteId === profileId || chessGame_started.playerBlackId === profileId) return {error: 'You are already in the game'};
+        return {error: 'Game is already started'};
+      }
+
+      // check if the player is already in the game
+      if(chessGame.playerWhiteId === profileId || chessGame.playerBlackId === profileId) return {error: 'You are already in the game'};
+
       if (chessGame.playerBlackId === null) {
         const updatedChessGame = await prisma.chessGame.update({
           where: { id: chessGameId },
@@ -83,7 +101,6 @@ export async function getChessGame({chessGameId}) {
                 select: {
                   profilename: true,
                   picture: true,
-                  email: true,
                   rating: true,
                 },
               },
@@ -96,7 +113,6 @@ export async function getChessGame({chessGameId}) {
                 select: {
                   profilename: true,
                   picture: true,
-                  email: true,
                   rating: true,
                 },
               },
