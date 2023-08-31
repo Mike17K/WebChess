@@ -31,7 +31,7 @@ export default function RatingGraph() {
     };
 
     var config = {
-      editable: false,
+      staticPlot: true
     };
 
     Plotly.newPlot(myDiv, data, layout, config);

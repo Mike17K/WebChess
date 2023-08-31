@@ -63,12 +63,25 @@ io.on('connection', async (socket) => {
     socket.emit('sent-room-data', getUsersInRoom(roomId));
   });
 
+  socket.on('unvote-move', ({sqIDFrom,sqIDTo,userId}) => {
+    // here it should be checked with the use of jwt TODO
+    const move = `${sqIDFrom}-${sqIDTo}`;
+    const user = users.filter((user) => user.id === userId)[0]
+    if (!user) return;
+    user.move = null;
+    console.log("unvoted-move: ",move);
+
+    socket.emit('unvoted-move', {move:move});
+    room.emit('unvoted-move', {move:move});
+  });
+
   
   socket.on('vote-move', ({sqIDFrom,sqIDTo,userId}) => {
     // here it should be checked with the use of jwt TODO
     const move = `${sqIDFrom}-${sqIDTo}`;
     users.filter((user) => user.id === userId)[0].move = move;
     console.log("voted-move: ",move);
+    socket.emit('voted-move', {move:move});
     room.emit('voted-move', {move:move});
   });
 

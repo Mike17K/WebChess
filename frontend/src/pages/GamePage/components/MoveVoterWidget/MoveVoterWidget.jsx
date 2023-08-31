@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-export default function MoveVoterWidget({votedMoves}) {
-  const [votedMove,setVotedMove] = useState("");
+export default function MoveVoterWidget({votedMoves,votedMove,setVotedMove}) {
   
   return (
 <div className='absolute -left-[200px] w-[150px] h-[400px] rounded-lg shadow-lg shadow-orange-400 border-4 border-grey gap-2 my-auto p-2 no-scrollbar overflow-y-auto bg-white'>
@@ -16,7 +15,7 @@ export default function MoveVoterWidget({votedMoves}) {
               >
                 <p className='text-[#3d6ac4] my-auto'>{move.move}</p>
                 <img src={`${process.env.PUBLIC_URL}/assets/icons/vote.png`} alt="" className='hidden w-0 h-[20px] text-center my-auto group-hover:block group-hover:w-[20px] ' /* add select styles TODO */ />
-                <p className='text-[#3d6ac4] my-auto'>{move.votes+((move.move == votedMove)?1:0)}</p>
+                <p className='text-[#3d6ac4] my-auto'>{move.votes}</p>
               </button>
                 )
             ) 

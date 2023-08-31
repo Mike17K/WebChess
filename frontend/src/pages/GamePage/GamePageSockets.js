@@ -20,6 +20,22 @@ export default function GamePageSockets({chessgameid, setData, setMySocket, setV
       setMySocket(socket);
   
       socket.connect();
+      
+      socket.on('unvoted-move', ({move}) => {
+        // {move: "e4", votes: 50},
+        console.log('unvoted-move', move);
+        setVotedMoves(prevVotedMoves => {
+          const index = prevVotedMoves.findIndex(votedMove => votedMove.move === move);
+          if(index === -1){
+            return [...prevVotedMoves]; // do nothing
+          }
+          prevVotedMoves[index].votes -= 1;
+          if(prevVotedMoves[index].votes === 0){
+            return prevVotedMoves.filter(votedMove => votedMove.move !== move); // remove move
+          }
+          return [...prevVotedMoves];
+        });
+      });
 
       socket.on('voted-move', ({move}) => {
         // {move: "e4", votes: 50},

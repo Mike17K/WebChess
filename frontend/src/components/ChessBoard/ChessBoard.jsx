@@ -32,7 +32,7 @@ function fenToPieceNamesArray(fen, board) {
   }
 }
 
-export default function ChessBoard({ fen, className, whiteSide, moveCallback,setVotedMoves=()=>{}, onSquarePressCallback=()=>{} }) {
+export default function ChessBoard({ fen, className, whiteSide, moveCallback, onSquarePressCallback=()=>{} }) {
   const [squares, setSquares] = useState([]);
   const draggableRef = useRef();
 
@@ -166,7 +166,6 @@ export default function ChessBoard({ fen, className, whiteSide, moveCallback,set
             <Square
               state={state}
               setState={setState}
-              setVotedMoves={setVotedMoves}
               highLightedColor={highLightedColor}
               key={(r - 1) * 8 + c - 1}
               id={(r - 1) * 8 + c - 1}
@@ -185,7 +184,6 @@ export default function ChessBoard({ fen, className, whiteSide, moveCallback,set
                 <Square
                 state={state}
                 setState={setState}
-                setVotedMoves={setVotedMoves}
                 highLightedColor={highLightedColor}
                 key={(r - 1) * 8 + c - 1}
                 id={(r - 1) * 8 + c - 1}

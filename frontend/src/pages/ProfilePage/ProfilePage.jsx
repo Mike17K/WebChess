@@ -7,7 +7,8 @@ export default function ProfilePage() {
   const {profileid} = useParams();
   const profile = store.getState().profile;
   const [profileData, setProfileData] = useState({});
-/*
+
+  /*
 useEffect(() => {   
     fetch(`http://localhost:5050/api/profile/${profileid}`, {
         method: 'GET',
