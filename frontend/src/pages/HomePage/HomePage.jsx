@@ -80,8 +80,9 @@ export default function HomePage() {
             
                 console.log("error: ",error);
             if(error == 'You are already in the game'){
-              setAccessGame({key:"",url:game.url,id:game.id});
-              window.location.href = game.url;
+              console.log("You are already in the game", url, accessKey, id);
+              // setAccessGame({key:accessKey,url:game.url,id:game.id});
+              // window.location.href = game.url;
               return;
             }
             

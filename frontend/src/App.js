@@ -21,7 +21,7 @@ async function refreshAccessServerKey(){
 
   if (!userId || !refresh_token) return console.log("Error: ",userId,refresh_token);
 
-  const {access_server_key,ttl} = await fetch('http://localhost:5050/api/users/refreshAccessServerKey', {
+  const res = await fetch('http://localhost:5050/api/users/refreshAccessServerKey', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -29,7 +29,16 @@ async function refreshAccessServerKey(){
     body: JSON.stringify({userId:userId,refresh_token:refresh_token})
   }).then(response => response.json()).catch(err => console.log(err));
 
-  if(!access_server_key || !ttl) return console.log("Error: ",access_server_key,ttl);
+  if(!res) {
+    // store.dispatch({type:"clearProfile"});
+    return console.log("Error: ",res);
+  }
+
+  const {access_server_key,ttl} = res;
+
+  if(!access_server_key || !ttl) {
+    return console.log("Error: ",access_server_key,ttl);
+  }
   // update the access_server_key in the redux store
 
   store.dispatch({type:"updateProfile",profile:{access_server_key:access_server_key,ttl:ttl + Date.now()}});

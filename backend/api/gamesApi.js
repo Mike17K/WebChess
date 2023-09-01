@@ -53,12 +53,16 @@ export async function joinGame({ profileId, chessGameId }){
         if(chessGame_started == null) return {error: 'Invalid chessGameId'};
 
         // check if the player is already in the game
-        if(chessGame_started.playerWhiteId === profileId || chessGame_started.playerBlackId === profileId) return {error: 'You are already in the game'};
+        if(chessGame_started.playerWhiteId === profileId || chessGame_started.playerBlackId === profileId) {
+          return {id:chessGameId,url:`http://localhost:3000/chessgame/${chessGameId}` ,accessKey:chessGame_started.accessKey};
+        }
         return {error: 'Game is already started'};
       }
-
+      
       // check if the player is already in the game
-      if(chessGame.playerWhiteId === profileId || chessGame.playerBlackId === profileId) return {error: 'You are already in the game'};
+      if(chessGame.playerWhiteId === profileId || chessGame.playerBlackId === profileId) {
+        return {id:chessGameId,url:`http://localhost:3000/chessgame/${chessGameId}` ,accessKey:chessGame_started.accessKey};
+      }
 
       if (chessGame.playerBlackId === null) {
         const updatedChessGame = await prisma.chessGame.update({
@@ -172,28 +176,31 @@ export async function addMove({ userId,gameId, sqIDFrom, sqIDTo, accessToken }) 
         }
     });
     if(chessGame === null) return 400;
+
+    console.log("chessGame.accessKey: ",chessGame.accessKey);
+    console.log("accessToken: ",accessToken);
     if(chessGame.accessKey !== accessToken) return 400;
     let whiteIsPlaying = chessGame.fen.split(' ')[1] === 'w';
     if((chessGame.playerWhiteId === userId && whiteIsPlaying) || (chessGame.playerBlackId === userId && !whiteIsPlaying)){
-        // get fen and send the move to the engine with sqIDFrom and sqIDTo TODO
-
-        const {fen, error} = simpleEngine.move(chessGame.fen,sqIDFrom,sqIDTo);
-        // console.log("error: ",error);
-        // console.log("fen: ",fen);
-
-        if(!fen) return 400;
-
-        // translate the move to pgn TODO
-        // for now the moves will be saved as sqIDFrom + sqIDTo TODO
-        const pgn = chessGame.pgn + ' ' + sqIDFrom +"-"+ sqIDTo;
-
-        // update the database game with the new fen and pgn
-        const res = await prisma.chessGame.update({
-            where: { id: gameId },
-            data: { pgn: pgn , fen: fen, whitePlayerTime: chessGame.whitePlayerTime, blackPlayerTime: chessGame.blackPlayerTime},
-          })
-        
-        return { fen:fen };
+      // get fen and send the move to the engine with sqIDFrom and sqIDTo TODO
+      
+      const {fen, error} = simpleEngine.move(chessGame.fen,sqIDFrom,sqIDTo);
+      // console.log("error: ",error);
+      // console.log("fen: ",fen);
+      
+      if(!fen) return 400;
+      
+      // translate the move to pgn TODO
+      // for now the moves will be saved as sqIDFrom + sqIDTo TODO
+      const pgn = chessGame.pgn + ' ' + sqIDFrom +"-"+ sqIDTo;
+      
+      // update the database game with the new fen and pgn
+      const res = await prisma.chessGame.update({
+        where: { id: gameId },
+        data: { pgn: pgn , fen: fen, whitePlayerTime: chessGame.whitePlayerTime, blackPlayerTime: chessGame.blackPlayerTime},
+      })
+      
+      return { fen:fen };
     }
     return 400;
 }

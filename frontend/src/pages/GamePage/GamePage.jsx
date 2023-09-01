@@ -29,11 +29,7 @@ export default function GamePage() {
   const [mysocket, setMySocket] = useState(null);
   const [votedMove,setVotedMove] = useState("");
   const [votedMoves, setVotedMoves] = useState([
-    {move: "e4-1", votes: 50},
-    {move: "e5-1", votes: 48},
-    {move: "Nf3-1", votes: 40},
-    {move: "Nc6-1", votes: 30}
-  ]); // [{move: "e4", votes: 0}, {move: "e5", votes: 0}  
+  ]); // [{move: "e4-1", votes: 0}, {move: "e5-2", votes: 0}  
   
   useEffect(() => {
     fetch(`http://localhost:5050/api/game/getChessGame/${chessgameid}`,
@@ -97,7 +93,10 @@ export default function GamePage() {
         <ChessBoard className="ChessBoard w-[600px] z-0 aspect-square" 
         fen={data.fen} 
         whiteSide={whiteSide} 
-        moveCallback={()=> mysocket.emit("moved-piece")}
+        moveCallback={()=> {
+          mysocket.emit("moved-piece");
+          setVotedMoves([]);
+        }}
         onSquarePressCallback={({sqIDFrom,sqIDTo,userId,gameId,accessToken,accessServerKey})=>{
           // console.log("vote-move", {sqIDFrom,sqIDTo,userId});
           setVotedMove((votedMove) => {

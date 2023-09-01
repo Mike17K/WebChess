@@ -91,6 +91,7 @@ async function addMove(req, res, next) {
     // update the pgn for this game TODO
 
     const response = await gamesApi.addMove({ userId:userId,gameId:gameId, sqIDFrom:sqIDFrom, sqIDTo:sqIDTo, accessToken:accessToken });
+    console.log("addMove res: ",response);
     if(response===400) return res.status(400).send({ error: 'Invalid move' });
 
     const { fen } = response;
