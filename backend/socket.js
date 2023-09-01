@@ -59,6 +59,14 @@ io.on('connection', async (socket) => {
   users.push(user); 
   room.emit('user-connected', user);
 
+  socket.on('chat-message', (msg) => {
+    // msg: {icon, username, message}
+    socket.emit('chat-message', msg);
+    room.emit('chat-message', msg);
+  });
+
+
+
   socket.on('get-room-data', () => {
     socket.emit('sent-room-data', getUsersInRoom(roomId));
   });

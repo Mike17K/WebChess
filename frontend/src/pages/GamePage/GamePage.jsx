@@ -12,6 +12,7 @@ import PlayerLayout from './components/PlayerLayout/PlayerLayout';
 import GamePageSockets from './GamePageSockets.js';
 import VisitorsMoveLogic from './VisitorMoveLogic.js';
 import { store } from '../../redux/store';
+import GameChat from './components/GameChat/GameChat';
 
 const initDataState = {
   fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -117,6 +118,9 @@ export default function GamePage() {
         }/>
           <PlayerLayout bottomPlayer={true} player={(whiteSide)?data.playerWhite:data.playerBlack} timeRemaining={(whiteSide)?data.whitePlayerTime:data.blackPlayerTime} />
         </div>
+        {
+          profile.access_server_key && <GameChat socket={mysocket}/>
+        }
       </div>
       {/* <button onClick={(e)=>{setWhiteSide(!whiteSide)}}>Rotate</button> */}
     </div>

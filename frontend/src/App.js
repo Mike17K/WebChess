@@ -13,6 +13,7 @@ import { store } from "./redux/store.js";
 import { useEffect } from "react";
 import ProfilePage from "./pages/ProfilePage/ProfilePage.jsx";
 
+
 async function refreshAccessServerKey(){
   console.log("refreshed access_server_key...");
   const profile = store.getState().profile;
