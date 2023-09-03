@@ -103,8 +103,24 @@ async function addMove(req, res, next) {
     const board = fenToBoard(fen);
     if(!board) return res.status(400).send({ error: 'Invalid fen' });
 
-    // update the fen for this game TODO
-    return res.json({board:board, whiteIsPlaying:fen.split(' ')[1] === 'w', leagalMoves:leagalMoves});
+    const state = simpleEngine.getGameState(fen); // TODO // checkmate stalemate check normal
+    switch(state){ 
+        case 'checkmate':
+            // update the database game with the new fen and pgn
+            await gamesApi.updateChessGame({ gameId:gameId, fen:fen, pgn:response.pgn, state:state });
+            return res.status(200).send({ board:board, whiteIsPlaying:fen.split(' ')[1] === 'w', leagalMoves:leagalMoves, state:state });
+        case 'draw':
+            // update the database game with the new fen and pgn
+            await gamesApi.updateChessGame({ gameId:gameId, fen:fen, pgn:response.pgn, state:state });
+            return res.status(200).send({ board:board, whiteIsPlaying:fen.split(' ')[1] === 'w', leagalMoves:leagalMoves, state:state });
+        case 'normal':
+            // update the database game with the new fen and pgn
+            await gamesApi.updateChessGame({ gameId:gameId, fen:fen, pgn:response.pgn, state:"STARTED" });
+            return res.status(200).send({ board:board, whiteIsPlaying:fen.split(' ')[1] === 'w', leagalMoves:leagalMoves, state:state });
+        default:
+            return res.status(400).send({ error: 'Invalid move' });
+    }
+
 }
 
 export const addMovePipe = [validatePlayer,addMove];

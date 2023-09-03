@@ -5,6 +5,7 @@ const simpleEngine = await import('./simpleEngineController.js');
 
 // all controllers must have the functions bellow
 // getLeagalMoves ,
+
 const functions = ['getLeagalMoves', 'getEvaluation']
 
 let controllers = {}

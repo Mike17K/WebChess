@@ -204,6 +204,40 @@ export function getLeagalMoves(fen) {
     return leagalMoves;
 }
 
+export function getGameState(fen) { 
+    const fenParts = fen.split(' ');
+
+    const board = fenToBoard(fen);
+    const whiteToPlay = fen.split(' ')[1] === 'w';
+    
+    const leagalMoves_white = getLeagalMoves(fenParts[0] + ' w ' + fenParts[2] + ' ' + fenParts[3] + ' ' + fenParts[4] + ' ' + fenParts[5]);
+    const leagalMoves_black = getLeagalMoves(fenParts[0] + ' b ' + fenParts[2] + ' ' + fenParts[3] + ' ' + fenParts[4] + ' ' + fenParts[5]);
+
+    let number_of_leagal_moves_white = 0;
+    let attacking_moves_white = [];
+    let number_of_leagal_moves_black = 0;
+    let attacking_moves_black = [];
+
+    for(let piece in leagalMoves_white){
+        number_of_leagal_moves_white += leagalMoves_white[piece].length;
+        attacking_moves_white = attacking_moves_white.concat(leagalMoves_white[piece]);
+    }
+    for(let piece in leagalMoves_black){
+        number_of_leagal_moves_black += leagalMoves_black[piece].length;
+        attacking_moves_black = attacking_moves_black.concat(leagalMoves_black[piece]);
+    }
+
+    const whiteKingPos = board.findIndex(e => e === 'wK');
+    const blackKingPos = board.findIndex(e => e === 'bK');
+
+    const whiteKingInCheck = attacking_moves_black.includes(blackKingPos);
+    const blackKingInCheck = attacking_moves_white.includes(whiteKingPos);
+
+    if(whiteKingInCheck && number_of_leagal_moves_white === 0) return 'checkmate'; //'blackWin';
+    if(blackKingInCheck && number_of_leagal_moves_black === 0) return 'checkmate'; //'whiteWin';
+    if(!whiteKingInCheck && number_of_leagal_moves_white === 0) return 'draw';
+    return 'normal';    
+}
 
 export async function getEvaluation(fen) {
     return 1; //TODO implementation

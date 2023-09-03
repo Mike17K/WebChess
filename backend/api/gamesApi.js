@@ -14,6 +14,8 @@ prisma.$connect()
 
 
 
+
+
 export async function createNewGame({profileId}) {
     const newGame = await prisma.chessGame.create({
         data: {
@@ -127,6 +129,14 @@ export async function getChessGame({chessGameId}) {
       
     if (chessGame === null) return {};
     return { fen:chessGame.fen,playerWhite:chessGame.playerWhite, playerBlack:chessGame.playerBlack, pgn:chessGame.pgn, status:chessGame.status, startTime: chessGame.startTime, whitePlayerTime:chessGame.whitePlayerTime, blackPlayerTime:chessGame.blackPlayerTime };
+}
+
+export async function updateChessGame({ gameId, fen, pgn, state }) {
+    const updatedChessGame = await prisma.chessGame.update({
+        where: { id: gameId },
+        data: { fen: fen, pgn: pgn, status: state },
+      });
+      return updatedChessGame;
 }
 
 export async function gameTokenValidation({ gameId, token }) {
